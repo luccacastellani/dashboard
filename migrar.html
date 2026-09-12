@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrar dados do dashboard</title>
+<style>
+    :root {
+        --bg: #facc15;
+        --card: rgba(255, 248, 204, 0.94);
+        --ink: #111111;
+        --muted: #3f3f3f;
+        --border: rgba(0, 0, 0, 0.24);
+        --ok: #166534;
+        --warn: #a16207;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        line-height: 1.55;
+    }
+    .wrap { max-width: 720px; width: 100%; }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.35rem; }
+    h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
+    p { margin-bottom: 0.75rem; }
+    .sub { color: var(--muted); margin-bottom: 1.5rem; }
+    ul { margin: 0 0 0.75rem 1.25rem; }
+    li { margin-bottom: 0.3rem; }
+    .btn {
+        display: inline-block;
+        background: var(--ink);
+        color: var(--bg);
+        border: none;
+        border-radius: 8px;
+        padding: 0.8rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        margin: 0.25rem 0.5rem 0.25rem 0;
+    }
+    .btn:hover { background: #000; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--ink);
+    }
+    .status {
+        padding: 0.75rem 0.9rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .status.ok { background: rgba(22,101,52,0.12); border-color: rgba(22,101,52,0.5); }
+    .status.warn { background: rgba(161,98,7,0.12); border-color: rgba(161,98,7,0.5); }
+    textarea {
+        width: 100%;
+        min-height: 130px;
+        font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+        font-size: 0.78rem;
+        padding: 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.7);
+        resize: vertical;
+    }
+    code {
+        background: rgba(0,0,0,0.08);
+        padding: 0.1rem 0.35rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    .keys { font-size: 0.9rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="card">
+        <h1>Migrar dados do dashboard</h1>
+        <p class="sub">
+            Passe suas tarefas, avaliações e histórico de estudo da versão antiga
+            (aberta por duplo clique no <code>index.html</code>) para a versão nova,
+            que roda em <code>localhost:8000</code>.
+        </p>
+
+        <div id="status" class="status">Verificando…</div>
+
+        <h2>Passo 1 — Salvar os dados</h2>
+        <p>
+            <strong>Importante:</strong> esta página precisa ser aberta com um
+            duplo clique no arquivo <code>migrar.html</code>, do mesmo jeito que
+            você abria o dashboard antes. Só assim ela enxerga os dados antigos.
+        </p>
+
+        <div id="found" class="keys"></div>
+
+        <p style="margin-top:1rem;">
+            <button id="download" class="btn">Baixar arquivo de dados</button>
+            <button id="copy" class="btn btn-ghost">Copiar para a área de transferência</button>
+        </p>
+
+        <details style="margin-top:0.5rem;">
+            <summary style="cursor:pointer; font-weight:600;">Ver / copiar manualmente</summary>
+            <p style="margin-top:0.6rem;">
+                <textarea id="json" readonly></textarea>
+            </p>
+        </details>
+    </div>
+
+    <div class="card">
+        <h2>Passo 2 — Colocar no dashboard novo</h2>
+        <ol style="margin-left:1.25rem;">
+            <li>Abra o dashboard com <code>iniciar.bat</code></li>
+            <li>Vá em <strong>Início → Configurar Google</strong></li>
+            <li>Em <strong>Importar dados antigos</strong>, escolha o arquivo que
+                você baixou (ou cole o texto copiado)</li>
+            <li>Clique em <strong>Importar</strong></li>
+        </ol>
+        <p style="margin-top:0.75rem; color:var(--muted); font-size:0.9rem;">
+            A importação só acrescenta e substitui as chaves do dashboard.
+            Nada da sua conta do Google é tocado.
+        </p>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    var PREFIXO = 'ese';
+
+    function coletar() {
+        var dados = {};
+        for (var i = 0; i < localStorage.length; i++) {
+            var chave = localStorage.key(i);
+            if (chave && chave.indexOf(PREFIXO) === 0) {
+                dados[chave] = localStorage.getItem(chave);
+            }
+        }
+        return dados;
+    }
+
+    var dados = coletar();
+    var chaves = Object.keys(dados);
+    var pacote = JSON.stringify({
+        formato: 'ese-dashboard-backup',
+        versao: 1,
+        origem: location.href,
+        data: new Date().toISOString(),
+        dados: dados
+    }, null, 2);
+
+    var statusEl = document.getElementById('status');
+    var foundEl = document.getElementById('found');
+    var jsonEl = document.getElementById('json');
+    var downloadBtn = document.getElementById('download');
+    var copyBtn = document.getElementById('copy');
+
+    jsonEl.value = pacote;
+
+    if (chaves.length === 0) {
+        statusEl.className = 'status warn';
+        statusEl.textContent = 'Nenhum dado encontrado nesta página.';
+        foundEl.innerHTML =
+            '<p>Isso acontece quando esta página não foi aberta do mesmo jeito que o ' +
+            'dashboard antigo. Feche esta aba, vá até a pasta do dashboard e dê um ' +
+            'duplo clique em <code>migrar.html</code>.</p>' +
+            '<p>Se você nunca usou o dashboard antes, não há nada para migrar — ' +
+            'pode ignorar esta página.</p>';
+        downloadBtn.disabled = true;
+        copyBtn.disabled = true;
+        return;
+    }
+
+    var rotulos = {
+        eseTasks: 'Pendências',
+        eseAssessments: 'Avaliações',
+        eseSubjectsByBimester: 'Matérias',
+        eseStudyHistory: 'Histórico de estudo',
+        eseAttendanceSubjects: 'Controle de presença (não usado na versão nova)',
+        eseGlobalBimester: 'Bimestre selecionado'
+    };
+
+    function descrever(chave) {
+        var rotulo = rotulos[chave] || chave;
+        var valor = dados[chave];
+        var extra = '';
+        try {
+            var parsed = JSON.parse(valor);
+            if (Array.isArray(parsed)) extra = ' — ' + parsed.length + ' item(ns)';
+            else if (parsed && typeof parsed === 'object') extra = ' — ' + Object.keys(parsed).length + ' registro(s)';
+        } catch (e) { /* valor simples */ }
+        return '<li><strong>' + rotulo + '</strong>' + extra + '</li>';
+    }
+
+    statusEl.className = 'status ok';
+    statusEl.textContent = 'Encontrei ' + chaves.length + ' conjunto(s) de dados para migrar.';
+    foundEl.innerHTML = '<ul>' + chaves.map(descrever).join('') + '</ul>';
+
+    downloadBtn.addEventListener('click', function () {
+        var blob = new Blob([pacote], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'dashboard-ese-dados.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        downloadBtn.textContent = 'Arquivo baixado ✓';
+    });
+
+    copyBtn.addEventListener('click', function () {
+        jsonEl.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        if (!ok && navigator.clipboard) {
+            navigator.clipboard.writeText(pacote).then(function () {
+                copyBtn.textContent = 'Copiado ✓';
+            });
+            return;
+        }
+        copyBtn.textContent = ok ? 'Copiado ✓' : 'Copie manualmente abaixo';
+    });
+})();
+</script>
+</body>
+</html>

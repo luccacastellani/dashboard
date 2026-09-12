@@ -1,0 +1,239 @@
+/* ==========================================================
+   CRONOGRAMA INTELIGENTE — layout
+   (o plano em blocos está em desempenho.css, seção "cron-")
+   ========================================================== */
+
+/* ---------- Coluna das pendências ---------- */
+
+/* O seletor de bimestre vira uma linha discreta, não um cartão. */
+#ai-generator .semester-selector {
+    background: transparent;
+    border: none;
+    backdrop-filter: none;
+    padding: 0 0 0.75rem;
+    justify-content: flex-start;
+    gap: 0.6rem;
+}
+
+#ai-generator .semester-selector label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+#ai-generator .semester-selector select {
+    flex: 0 1 12rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+}
+
+/* Formulário compacto: nome e matéria em linha cheia,
+   prazo e dificuldade lado a lado, botão embaixo. */
+#task-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+#task-form > input#task-name,
+#task-form > #task-subject-container,
+#task-form > button { grid-column: 1 / -1; }
+
+#task-form input,
+#task-form select,
+#task-form .custom-dropdown-selected {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+}
+
+#task-form > button { margin-top: 0.25rem; }
+
+.task-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.6rem 0 0.4rem;
+}
+
+/* ---------- Coluna do gerador ---------- */
+
+.cronograma-dica {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 0.9rem;
+}
+
+.cron-disponivel { margin-bottom: 1rem; }
+
+.cron-disponivel-titulo {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.cron-total-semana {
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-main);
+}
+
+/* Os dias como fichas brancas, número grande dentro */
+#ai-generator .day-input {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    padding: 0.45rem 0.25rem 0.35rem;
+    gap: 0.15rem;
+}
+
+#ai-generator .day-input label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+
+#ai-generator .day-input input {
+    background: transparent;
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding: 0.1rem 0;
+    -moz-appearance: textfield;
+}
+
+#ai-generator .day-input input::-webkit-outer-spin-button,
+#ai-generator .day-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+#ai-generator .day-input input:focus {
+    outline: none;
+    background: rgba(250, 204, 21, 0.25);
+    border-radius: 6px;
+}
+
+#cron-gerar-btn { margin-top: 0.25rem; }
+
+/* ---------- Cabeçalho do plano ---------- */
+
+.cron-cab-esq {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.cron-h3 { margin: 0; }
+
+.cron-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+.cron-pill {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.55);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.cron-pill-ok {
+    border-color: rgba(22, 101, 52, 0.4);
+    background: rgba(22, 101, 52, 0.1);
+    color: var(--success);
+}
+
+.cron-rodape {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.cron-legenda { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.cron-legenda i {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 2px;
+    margin-left: 0.5rem;
+}
+
+.cron-legenda i:first-child { margin-left: 0; }
+.cron-legenda i.dif-alta { background: var(--danger); }
+.cron-legenda i.dif-media { background: var(--warning); }
+.cron-legenda i.dif-baixa { background: var(--success); }
+
+/* ---------- Desempenho: cabeçalho e blocos ---------- */
+
+.perf-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.perf-cab h2 { margin: 0; }
+
+.perf-nav { display: flex; align-items: center; gap: 0.35rem; }
+
+.perf-range { font-weight: 700; min-width: 8rem; text-align: center; }
+
+.perf-tiles {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.perf-tile {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    min-width: 0;
+}
+
+.perf-materias { margin-top: 0; }
+
+.perf-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+}
+
+/* Ação destrutiva: um link discreto, não um botão vermelho. */
+.perf-link-perigo {
+    background: none;
+    border: none;
+    padding: 0.25rem 0;
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.perf-link-perigo:hover { color: var(--danger); }
+
+@media (max-width: 900px) {
+    .perf-tiles { grid-template-columns: 1fr 1fr; }
+    .perf-tile-meta { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+    .perf-tiles { grid-template-columns: 1fr; }
+    #task-form { grid-template-columns: 1fr; }
+    .perf-tools { justify-content: flex-start; }
+}

@@ -1,0 +1,11 @@
+# Coisas que sao so do PC ou lixo de trabalho
+backup-original/
+__pycache__/
+Dashboard.exe
+index.html.bak-merge
+index.html.quebrado
+docs/superpowers/
+.claude/
+
+# Anotacoes pessoais: ficam so no PC
+LEIA-ME.md

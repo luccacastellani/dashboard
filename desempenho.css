@@ -1,0 +1,367 @@
+/* ==========================================================
+   DESEMPENHO (extras) e CRONOGRAMA (plano em semana)
+   ========================================================== */
+
+/* ---------- Timer: matéria ---------- */
+
+.timer-materia { margin-top: 0.35rem; }
+
+.timer-materia select {
+    min-width: 12rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+#focus-timer.fullscreen-timer .timer-materia select {
+    font-size: 1.05rem;
+    padding: 0.6rem 0.8rem;
+}
+
+/* Tela cheia do Timer: o conteúdo era mais alto que a janela e vazava
+   pelo topo (o título ficava cortado atrás do "Sair"). Menor e com
+   respiro; se ainda não couber, rola em vez de cortar. */
+#focus-timer.fullscreen-timer {
+    padding: 4.5rem 2rem 2rem !important;
+    justify-content: safe center !important;
+    overflow-y: auto !important;
+    gap: 0.5rem !important;
+}
+
+#focus-timer.fullscreen-timer h2 {
+    font-size: 1.8rem !important;
+    margin-bottom: 0 !important;
+}
+
+#focus-timer.fullscreen-timer .timer-display,
+#focus-timer.fullscreen-timer #timer {
+    font-size: clamp(4rem, 11vw, 8rem) !important;
+    margin: 0.5rem 0 !important;
+}
+
+#focus-timer.fullscreen-timer .timer-settings,
+#focus-timer.fullscreen-timer .pause-stats {
+    font-size: 1.05rem !important;
+    margin-top: 0.75rem !important;
+}
+
+#focus-timer.fullscreen-timer .timer-controls {
+    margin-top: 1rem !important;
+    gap: 1rem !important;
+}
+
+#focus-timer.fullscreen-timer .timer-controls button {
+    padding: 0.8rem 1.8rem !important;
+    font-size: 1.05rem !important;
+}
+
+/* ---------- Desempenho: blocos ---------- */
+
+.perf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.perf-bloco {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    min-width: 0;
+}
+
+.perf-bloco-largo { grid-column: 1 / -1; }
+
+.perf-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.perf-meta-edit {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.78rem;
+}
+
+.perf-meta-edit input {
+    width: 3.2rem;
+    padding: 0.15rem 0.3rem;
+    margin: 0 0.2rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.8rem;
+    background: #ffffff;
+}
+
+.perf-numero {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.perf-de {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.perf-barra {
+    height: 0.55rem;
+    margin: 0.55rem 0 0.4rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.perf-barra span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--primary);
+    transition: width 0.4s;
+}
+
+.perf-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.perf-materia {
+    display: grid;
+    grid-template-columns: minmax(6rem, 12rem) 1fr auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.25rem 0;
+    font-size: 0.85rem;
+}
+
+.perf-materia-nome {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.perf-materia-barra {
+    height: 0.6rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.perf-materia-barra span {
+    display: block;
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+}
+
+.perf-materia-h {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    min-width: 3.5rem;
+    text-align: right;
+}
+
+.perf-pend { font-size: 0.9rem; line-height: 1.6; }
+.perf-pend .ok { color: var(--success); }
+.perf-pend .ruim { color: var(--danger); }
+
+@media (max-width: 700px) {
+    .perf-grid { grid-template-columns: 1fr; }
+    .perf-materia { grid-template-columns: minmax(5rem, 8rem) 1fr auto; }
+}
+
+/* ==========================================================
+   CRONOGRAMA — a semana de blocos
+   ========================================================== */
+
+.cron-agenda {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.cron-max { font-size: 0.85rem; color: var(--text-muted); }
+
+.cron-max input {
+    width: 3.4rem;
+    padding: 0.25rem 0.3rem;
+    margin: 0 0.2rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-align: center;
+    font-family: inherit;
+    background: #ffffff;
+}
+
+.cron-agenda-nota {
+    flex-basis: 100%;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* A área de resultado vira a semana */
+#ai-response-container.ai-output {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.cron-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.cron-nav { display: flex; align-items: center; gap: 0.35rem; }
+
+.cron-titulo { font-weight: 700; min-width: 9rem; text-align: center; }
+
+.cron-resumo { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+
+.cron-aviso {
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(185, 28, 28, 0.45);
+    background: rgba(185, 28, 28, 0.08);
+    color: var(--danger);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.cron-grade {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.cron-col {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.45rem;
+    min-height: 7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.cron-col.is-today {
+    border-color: var(--primary);
+    border-width: 2px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.cron-col-cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cron-col-dia { font-weight: 700; font-size: 0.82rem; text-transform: uppercase; }
+.cron-col-data { font-size: 0.78rem; color: var(--text-muted); }
+
+.cron-livre { margin: auto; font-size: 0.8rem; color: var(--text-muted); opacity: 0.6; }
+
+.cron-bloco {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.35rem 0.4rem;
+    border: none;
+    border-left: 3px solid var(--warning);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--text-main);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cron-bloco:hover { background: #ffffff; }
+.cron-bloco.dif-alta { border-left-color: var(--danger); }
+.cron-bloco.dif-baixa { border-left-color: var(--success); }
+.cron-bloco.feito { opacity: 0.7; border-left-color: var(--success); }
+.cron-bloco.feito .cron-bloco-nome { text-decoration: line-through; }
+
+.cron-check {
+    flex: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.1rem;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+}
+
+.cron-bloco.feito .cron-check { background: var(--success); border-color: var(--success); }
+
+.cron-bloco.feito .cron-check::after {
+    content: "";
+    width: 0.3rem;
+    height: 0.55rem;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: translateY(-1px) rotate(45deg);
+}
+
+.cron-bloco-texto { display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
+.cron-bloco-materia { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cron-bloco-nome { font-size: 0.8rem; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.cron-bloco-min { font-size: 0.72rem; color: var(--text-muted); }
+
+.cron-col-total {
+    margin-top: auto;
+    padding-top: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.cron-depois { margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-muted); }
+.cron-rodape { margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-muted); }
+
+@media (max-width: 900px) {
+    .cron-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+    .cron-grade { grid-template-columns: 1fr; gap: 0.6rem; }
+    .cron-col { min-height: 0; }
+    .cron-col.is-today { order: -1; }
+    .cron-check { width: 1.5rem; height: 1.5rem; }
+    .cron-bloco { padding: 0.5rem; }
+    .cron-bloco-nome { font-size: 0.9rem; }
+}

@@ -1,0 +1,742 @@
+/* ==========================================================
+   ESTILOS DAS ÁREAS DO GOOGLE
+   ----------------------------------------------------------
+   Visão Geral, aba Google Tasks e faixa semanal do Calendário.
+   Fica separado do style.css original de propósito, para não
+   misturar com o trabalho já existente.
+   ========================================================== */
+
+.overview-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.overview-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.overview-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.35rem;
+    margin: 1.5rem 0 0.85rem;
+}
+
+/* Botão do Gemini — azul, para destacar do amarelo do tema */
+.btn-gemini {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+    transition: all 0.2s;
+}
+
+.btn-gemini::before {
+    content: "\2726";
+    font-size: 1rem;
+}
+
+.btn-gemini:hover {
+    filter: brightness(1.12);
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.45);
+}
+
+/* ---------- Barra de status da conexão ---------- */
+
+.google-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.7rem 0.9rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.04);
+    font-size: 0.9rem;
+}
+
+.google-status-bar.status-ok {
+    border-color: rgba(22, 101, 52, 0.5);
+    background: rgba(22, 101, 52, 0.10);
+}
+
+.google-status-bar.status-warn {
+    border-color: rgba(161, 98, 7, 0.5);
+    background: rgba(161, 98, 7, 0.12);
+}
+
+.google-status-bar.status-error {
+    border-color: rgba(185, 28, 28, 0.5);
+    background: rgba(185, 28, 28, 0.12);
+}
+
+.google-status-text {
+    font-weight: 600;
+    flex: 1;
+    min-width: 200px;
+}
+
+.google-status-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.google-age {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ---------- Faixa semanal ---------- */
+
+.week-section {
+    margin-bottom: 1.5rem;
+}
+
+.week-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.week-header-center {
+    text-align: center;
+}
+
+.week-header-center h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.week-header-tools {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+}
+
+.week-strip {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.week-day {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.4rem;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.week-day.is-today {
+    border-color: var(--primary);
+    border-width: 2px;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.week-day-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.week-day-name {
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.week-day-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Sem altura maxima e sem rolagem: o dia mostra tudo que tem,
+   e a linha inteira cresce ate caber o dia mais cheio. */
+.week-day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.week-event {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    background: rgba(255, 255, 255, 0.85);
+    border-left: 3px solid var(--primary);
+    border-radius: 5px;
+    padding: 0.3rem 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+}
+
+.week-event-time {
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.week-event-title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.week-event-assessment {
+    border-left-color: var(--danger);
+    background: rgba(185, 28, 28, 0.10);
+}
+
+.week-empty {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0.2rem 0.1rem;
+}
+
+.week-strip-compact .week-day {
+    min-height: 92px;
+}
+
+/* ---------- Vence em breve ---------- */
+
+.overview-due {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.due-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--text-muted);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    flex-wrap: wrap;
+}
+
+.due-item.is-late { border-left-color: var(--danger); }
+.due-item.is-urgent { border-left-color: #ea580c; }
+.due-item.is-soon { border-left-color: var(--warning); }
+
+.due-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.due-main strong {
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+}
+
+.due-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.due-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    white-space: nowrap;
+}
+
+.due-when {
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.due-origin {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* ---------- Aba Google Tasks ---------- */
+
+.gtasks-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.gtasks-group {
+    margin-bottom: 1.25rem;
+}
+
+.gtasks-group-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px dashed var(--border);
+}
+
+.gtasks-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.gtask-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--text-muted);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+}
+
+.gtask-item.is-late { border-left-color: var(--danger); }
+.gtask-item.is-urgent { border-left-color: #ea580c; }
+.gtask-item.is-soon { border-left-color: var(--warning); }
+
+.gtask-item.is-done {
+    opacity: 0.55;
+    border-left-color: var(--success);
+}
+
+.gtask-item.is-done .gtask-title {
+    text-decoration: line-through;
+}
+
+.gtask-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.gtask-title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.gtask-notes {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+.gtask-due {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ---------- Diversos ---------- */
+
+.empty-note {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+    padding: 0.75rem 0;
+}
+
+.field-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin: -0.25rem 0 0.5rem;
+}
+
+/* ---------- Telas estreitas ---------- */
+
+@media (max-width: 900px) {
+    .week-strip {
+        grid-template-columns: repeat(7, minmax(120px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .gtasks-form {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-top {
+        align-items: flex-start;
+    }
+}
+
+/* ---------- Importar dados antigos ---------- */
+
+.settings-sep {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 1rem 0 0.5rem;
+}
+
+#import-text {
+    width: 100%;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    resize: vertical;
+    margin: 0.5rem 0;
+}
+
+.import-status {
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-top: 0.4rem;
+    min-height: 1.2em;
+}
+
+.import-status.is-ok { color: var(--success); }
+.import-status.is-warn { color: var(--warning); }
+.import-status.is-error { color: var(--danger); }
+
+/* ---------- Conta Google no menu lateral ----------
+   A barra lateral é preta com texto amarelo, então tudo aqui
+   precisa de cor própria: herdar do corpo deixa escuro no escuro. */
+
+.sidebar-account {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(250, 204, 21, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-account-status {
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #facc15;
+    overflow-wrap: anywhere;
+    margin-bottom: 0.15rem;
+}
+
+.sidebar-account-status::before {
+    content: CF;
+    margin-right: 0.4rem;
+}
+
+.sidebar-account-status.is-on::before { color: #4ade80; }
+
+/* Estado da sincronização com o Drive, logo abaixo da conta. */
+.sync-status {
+    margin: -0.35rem 0 0.5rem;
+    font-size: 0.72rem;
+    color: rgba(250, 204, 21, 0.7);
+}
+
+.sync-status.pendente { color: #fbbf24; }
+.sync-status.enviando { color: rgba(250, 204, 21, 0.9); }
+.sidebar-account-status.is-off::before { color: #fb923c; }
+
+.sidebar-account .btn {
+    width: 100%;
+    font-size: 0.88rem;
+}
+
+/* Botão claro sobre o preto da barra lateral. */
+.sidebar-account .btn-primary {
+    background: #facc15;
+    color: #111111;
+}
+
+.sidebar-account .btn-primary:hover {
+    background: #fde047;
+}
+
+.sidebar-account .btn-secondary {
+    background: transparent;
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.6);
+}
+
+.sidebar-account .btn-secondary:hover {
+    background: rgba(250, 204, 21, 0.16);
+    color: #facc15;
+}
+
+/* ---------- Botão do Canvas ---------- */
+
+.btn-canvas {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #e2231a;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(226, 35, 26, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-canvas::before {
+    content: "\1F393";
+    font-size: 1rem;
+}
+
+.btn-canvas:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 14px rgba(226, 35, 26, 0.42);
+}
+
+/* ---------- Cartão do Gmail ---------- */
+
+.gmail-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-top: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+}
+
+.gmail-card:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.gmail-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.gmail-icon {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    flex: none;
+    border-radius: 8px;
+    background: #ea4335;
+    color: #ffffff;
+    font-size: 1.15rem;
+}
+
+.gmail-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.gmail-count {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.gmail-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.gmail-go {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    flex: none;
+}
+
+/* Quando há mensagem nova, o cartão se destaca. */
+/* Outlook: o mesmo cartão do Gmail "com não lidas", só que azul. */
+.outlook-card {
+    margin-top: 0.5rem;
+    border-color: rgba(15, 108, 189, 0.55);
+    background: linear-gradient(90deg, rgba(15, 108, 189, 0.14), rgba(15, 108, 189, 0.04));
+}
+
+.outlook-card:hover {
+    border-color: #0f6cbd;
+    background: linear-gradient(90deg, rgba(15, 108, 189, 0.18), rgba(15, 108, 189, 0.06));
+}
+
+.outlook-icon { background: #0f6cbd; }
+.outlook-titulo { font-size: 1.05rem; color: #0f4c8a; }
+
+.gmail-card.has-unread {
+    border-color: rgba(234, 67, 53, 0.55);
+    background: rgba(234, 67, 53, 0.08);
+}
+
+.gmail-card.has-unread .gmail-count {
+    color: #b3261e;
+}
+
+/* Segunda linha do cartão do Gmail: o recorte que pede ação. */
+.gmail-detail {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 0.1rem;
+}
+
+/* ---------- Zerar a semana, no Desempenho ---------- */
+
+.perf-tools {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.perf-reset-note {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--success);
+}
+
+/* ---------- Botão só com ícone (Claude) ---------- */
+
+.btn-square {
+    display: inline-grid;
+    place-items: center;
+    width: 2.55rem;
+    height: 2.55rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+    flex: none;
+}
+
+.btn-claude {
+    background: #d97757;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(217, 119, 87, 0.35);
+}
+
+.btn-claude:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 14px rgba(217, 119, 87, 0.45);
+}
+
+.btn-claude:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ---------- Pendências + Cronograma numa seção só ---------- */
+
+.cronograma-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .cronograma-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cronograma-col {
+    min-width: 0;
+}
+
+.cronograma-col .overview-heading {
+    margin-top: 0;
+}
+
+.cronograma-dica {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.45;
+}
+
+/* Campo de minutos dentro da linha da tarefa */
+.task-estimate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.task-estimate-input {
+    width: 4.2rem;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.task-estimate-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* O seletor de bimestre dentro do Cronograma precisa de ar embaixo. */
+.cronograma-col .semester-selector {
+    margin-bottom: 1rem;
+}

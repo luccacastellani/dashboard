@@ -1,0 +1,337 @@
+/* ==========================================================
+   ACADEMIA — a semana de treinos
+   Mesma linguagem visual da faixa "Sua semana" do Início.
+   ========================================================== */
+
+.acad-hoje {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: -0.25rem 0 1rem;
+}
+
+.acad-hoje strong { color: var(--text-main); }
+
+/* ---------- Cabeçalho: setas, título, Editar ---------- */
+
+.acad-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.acad-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.acad-seta {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.55);
+    color: var(--text-main);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.acad-seta:hover { background: rgba(255, 255, 255, 0.9); }
+
+.acad-titulo {
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 9rem;
+    text-align: center;
+}
+
+.acad-hoje-btn {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+}
+
+.acad-hoje-btn:hover { background: rgba(255, 255, 255, 0.6); color: var(--text-main); }
+
+/* ---------- A grade de 7 colunas ---------- */
+
+.acad-grade {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.acad-col {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.45rem;
+    min-height: 9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.acad-col.is-today {
+    border-color: var(--primary);
+    border-width: 2px;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.acad-col.is-completo { background: rgba(220, 252, 231, 0.55); }
+.acad-col.is-today.is-completo { background: rgba(220, 252, 231, 0.85); }
+
+.acad-col-cab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.acad-col-dia {
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.acad-col-data {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+
+.acad-descanso {
+    margin: auto;
+    color: var(--text-muted);
+    opacity: 0.6;
+    font-size: 0.8rem;
+}
+
+/* ---------- Modo normal: o treino do dia ---------- */
+
+.acad-treino {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+}
+
+.acad-treino-nome {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.25rem 0.4rem;
+    border-radius: 6px;
+    background: var(--primary);
+    color: var(--primary-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.acad-treino.completo .acad-treino-nome { background: var(--success); color: #ffffff; }
+
+.acad-exs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.acad-vazio { font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; padding: 0.2rem 0.3rem; }
+
+.acad-ex {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    padding: 0.3rem 0.35rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    border-left: 3px solid var(--primary);
+    min-width: 0;
+}
+
+.acad-treino.completo .acad-ex { border-left-color: var(--success); }
+
+/* O check do treino: uma bolinha ao lado do nome do dia. */
+.acad-col-dia {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.acad-check {
+    flex: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.acad-check:hover { border-color: var(--success); }
+
+.acad-check.ativo {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.acad-check.ativo::after {
+    content: "";
+    width: 0.3rem;
+    height: 0.55rem;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: translateY(-1px) rotate(45deg);
+}
+
+.acad-ex-nome {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.acad-ex-det {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.acad-rodape {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ---------- Modo Editar ---------- */
+
+.acad-grade.editando .acad-col { background: rgba(255, 255, 255, 0.7); }
+
+.acad-ed {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.acad-campo {
+    width: 100%;
+    min-width: 0;
+    padding: 0.3rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.78rem;
+}
+
+.acad-campo:focus { outline: none; border-color: var(--primary); }
+
+.acad-campo-treino {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.8rem;
+}
+
+.acad-campo-treino::placeholder { text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+.acad-ed-ex {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.3rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.acad-ed-nums {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.acad-ed-nums-2 { grid-template-columns: 1fr 1fr auto; }
+
+/* Campo + unidade ao lado: "40 kg", "20 min" */
+.acad-unidade {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    min-width: 0;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.acad-unidade .acad-campo { flex: 1; }
+
+.acad-campo-n {
+    padding: 0.25rem 0.2rem;
+    text-align: center;
+    font-size: 0.72rem;
+}
+
+.acad-x { font-size: 0.7rem; color: var(--text-muted); }
+
+.acad-remover {
+    width: 1.4rem;
+    height: 1.4rem;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.acad-remover:hover { background: rgba(185, 28, 28, 0.12); color: var(--danger); }
+
+.acad-adicionar {
+    width: 100%;
+    padding: 0.3rem 0.4rem;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.acad-adicionar:hover { border-style: solid; color: var(--text-main); background: rgba(255, 255, 255, 0.6); }
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .acad-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .acad-grade { grid-template-columns: 1fr; }
+    .acad-col { min-height: 0; }
+}

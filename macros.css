@@ -1,0 +1,624 @@
+/* ==========================================================
+   MACROS — anéis, dia, dieta, histórico
+   ========================================================== */
+
+/* ---------- Sub-abas da Academia ---------- */
+
+.acad-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.acad-topo h2 { margin: 0; }
+
+.acad-abas {
+    display: inline-flex;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.acad-aba {
+    padding: 0.35rem 0.9rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.acad-aba.active {
+    background: var(--primary);
+    color: var(--primary-text);
+}
+
+/* ---------- Dia / Dieta ---------- */
+
+.mac-telas { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; }
+
+.mac-tela {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mac-tela.ativo { background: rgba(255, 255, 255, 0.7); color: var(--text-main); border-color: var(--primary); }
+
+.mac-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.mac-metas {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.mac-metas label { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 600; }
+
+.mac-metas input {
+    width: 3.6rem;
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #ffffff;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.8rem;
+    -moz-appearance: textfield;
+}
+
+.mac-metas input::-webkit-outer-spin-button,
+.mac-metas input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---------- Anéis ---------- */
+
+.mac-aneis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    padding: 0.9rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.9rem;
+}
+
+.mac-anel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.mac-anel svg {
+    width: 6rem;
+    height: 6rem;
+    transform: rotate(-90deg);
+}
+
+.mac-anel-fundo { fill: none; stroke: rgba(0, 0, 0, 0.1); stroke-width: 8; }
+
+.mac-anel-valor {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.mac-anel.kcal .mac-anel-valor { stroke: #111111; }
+.mac-anel.p .mac-anel-valor { stroke: #b91c1c; }
+.mac-anel.c .mac-anel-valor { stroke: #a16207; }
+.mac-anel.g .mac-anel-valor { stroke: #166534; }
+.mac-anel.passou .mac-anel-valor { stroke: #ef4444; }
+
+.mac-anel-centro {
+    position: absolute;
+    top: 0;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.mac-anel-num { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mac-anel-un { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+.mac-anel-rotulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.mac-anel-rotulo span { font-weight: 400; color: var(--text-muted); font-size: 0.7rem; }
+
+/* ---------- Adicionar ---------- */
+
+.mac-add { display: flex; gap: 0.5rem; }
+
+.mac-busca {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.mac-busca:focus { outline: none; border-color: var(--primary); }
+
+.mac-select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.mac-sugestoes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0.5rem 0 1rem;
+}
+
+.mac-sug {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "nome vezes" "det vezes";
+    gap: 0.1rem 0.75rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--text-main);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mac-sug:hover { background: #ffffff; border-color: var(--primary); }
+.mac-sug-nome { grid-area: nome; font-weight: 600; font-size: 0.88rem; }
+.mac-sug-nome em { font-style: normal; color: var(--text-muted); font-weight: 400; }
+.mac-sug-det { grid-area: det; font-size: 0.75rem; color: var(--text-muted); }
+
+.mac-sug-vezes { grid-area: vezes; display: inline-flex; gap: 0.2rem; }
+
+.mac-sug-vezes b {
+    display: grid;
+    place-items: center;
+    min-width: 1.7rem;
+    height: 1.7rem;
+    padding: 0 0.3rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.mac-sug-vezes b:hover, .mac-sug-vezes b.ativo { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+
+.mac-vazio { padding: 0.6rem 0.2rem; font-size: 0.85rem; color: var(--text-muted); }
+.mac-vazio-dia { text-align: center; padding: 1.2rem 0; }
+
+/* ---------- Refeições do dia ---------- */
+
+.mac-ref { margin-bottom: 0.8rem; }
+
+.mac-ref-cab {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding-bottom: 0.25rem;
+    border-bottom: 1px dashed var(--border);
+    margin-bottom: 0.35rem;
+}
+
+.mac-item, .mac-dieta-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.mac-item-nome { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.mac-item-nome em { font-style: normal; color: var(--text-muted); font-weight: 400; }
+.mac-item-macros { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.mac-x {
+    width: 1.6rem;
+    height: 1.6rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.mac-x:hover { background: rgba(185, 28, 28, 0.12); color: var(--danger); }
+
+.mac-mini {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+}
+
+.mac-mini:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.7); }
+.mac-dieta-acoes { display: inline-flex; gap: 0.3rem; align-items: center; }
+
+/* ---------- Histórico ---------- */
+
+.mac-hist {
+    margin-top: 1rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.mac-hist-cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.mac-legenda { display: inline-flex; align-items: center; gap: 0.3rem; text-transform: none; letter-spacing: 0; font-weight: 500; }
+.mac-legenda i { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 2px; margin-left: 0.45rem; }
+.mac-legenda i:first-child { margin-left: 0; }
+.mac-legenda i.kcal { background: #111111; }
+.mac-legenda i.p { background: #b91c1c; }
+.mac-legenda i.c { background: #a16207; }
+.mac-legenda i.g { background: #166534; }
+
+.mac-hist-svg { width: 100%; height: auto; display: block; }
+.mac-hist-svg rect { fill: rgba(17, 17, 17, 0.75); }
+.mac-hist-svg rect.passou { fill: #ef4444; }
+.mac-hist-svg text { font-size: 11px; fill: var(--text-muted); font-family: inherit; }
+.mac-meta-linha { stroke: rgba(0, 0, 0, 0.35); stroke-dasharray: 4 4; }
+.mac-linha { fill: none; stroke-width: 2; opacity: 0.85; }
+.mac-linha.p { stroke: #b91c1c; }
+.mac-linha.c { stroke: #a16207; }
+.mac-linha.g { stroke: #166534; }
+
+/* ---------- Dieta ---------- */
+
+.mac-dieta-novo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.mac-dieta-titulo {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.mac-dica { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.75rem; }
+
+.mac-form, .mac-off {
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.mac-form input[type="text"], .mac-off input[type="text"] {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.88rem;
+}
+
+.mac-form-porcao { display: grid; grid-template-columns: 5rem 1fr; gap: 0.5rem; }
+
+.mac-form-nums {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+}
+
+.mac-form-nums label { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+.mac-form-nums input { text-align: center; padding: 0.45rem 0.3rem; }
+
+.mac-form-acoes { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+
+.mac-off .mac-dieta-titulo { margin-bottom: 0; }
+.mac-off-busca { display: flex; gap: 0.5rem; }
+.mac-off-gramas { font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem; }
+.mac-off-gramas input { width: 4.5rem !important; display: inline-block; text-align: center; margin: 0 0.3rem; }
+.mac-off .mac-sugestoes { margin: 0; }
+.mac-msg { font-size: 0.8rem; color: var(--warning); font-weight: 600; }
+
+.mac-dieta-lista { display: flex; flex-direction: column; }
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .mac-dieta-novo { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+    .mac-aneis { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .mac-anel svg, .mac-anel-centro { width: 5.5rem; height: 5.5rem; }
+    .mac-item, .mac-dieta-item { grid-template-columns: 1fr auto; }
+    .mac-item-macros { grid-column: 1; white-space: normal; }
+    .mac-item .mac-x, .mac-dieta-acoes { grid-column: 2; grid-row: 1 / span 2; }
+    .mac-sug { grid-template-columns: 1fr; grid-template-areas: "nome" "det" "vezes"; }
+    .mac-sug-vezes b { min-width: 2.2rem; height: 2.2rem; }
+    .mac-form-nums { grid-template-columns: repeat(2, 1fr); }
+    .mac-x { width: 2.2rem; height: 2.2rem; font-size: 0.9rem; }
+    .mac-metas { width: 100%; }
+}
+
+/* ---------- Câmera ---------- */
+
+.mac-camera {
+    position: relative;
+    margin-top: 0.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111111;
+}
+
+.mac-camera video {
+    display: block;
+    width: 100%;
+    max-height: 60vh;
+    object-fit: cover;
+    background: #000;
+}
+
+.mac-camera-mira {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: 30%;
+    bottom: 30%;
+    border: 2px solid rgba(250, 204, 21, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+.mac-camera-rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.7rem;
+    color: #facc15;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.mac-off-busca { flex-wrap: wrap; }
+.mac-off-busca input { flex: 1 1 12rem; }
+
+/* ==========================================================
+   Layout novo: refeições com fichas, formulário com rótulos,
+   gráfico só de calorias
+   ========================================================== */
+
+.mac-telas { margin: 0.9rem 0 1rem; }          /* respiro do sublinhado do título */
+
+.mac-refeicoes { display: flex; flex-direction: column; gap: 0.9rem; margin: 0.9rem 0 0; }
+
+.mac-ref {
+    padding: 0.6rem 0.75rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.mac-ref .mac-ref-cab { margin-bottom: 0.45rem; }
+.mac-ref-nome { font-size: 0.8rem; }
+.mac-ref-kcal { font-weight: 600; text-transform: none; letter-spacing: 0; }
+
+.mac-item { grid-template-columns: 1fr auto auto auto; }
+
+.mac-qtd { display: inline-flex; align-items: center; gap: 0.15rem; font-variant-numeric: tabular-nums; }
+.mac-qtd b { min-width: 2.2rem; text-align: center; font-size: 0.8rem; }
+
+.mac-qtd-btn {
+    width: 1.6rem;
+    height: 1.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.mac-qtd-btn:hover { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+
+/* As fichas "+ comida" de cada refeição */
+.mac-fichas { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem; }
+
+.mac-ficha {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.45rem;
+    border: 1px dashed var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mac-ficha:hover { background: #ffffff; border-style: solid; border-color: var(--primary); }
+.mac-ficha-mais { font-weight: 700; color: var(--text-muted); }
+.mac-ficha-kcal { font-weight: 400; color: var(--text-muted); font-size: 0.72rem; }
+.mac-fichas-vazio { font-size: 0.75rem; color: var(--text-muted); padding: 0.2rem 0; }
+
+/* Gráfico: só calorias */
+.mac-hist-svg text.mac-valor { font-size: 12px; font-weight: 700; fill: var(--text-main); }
+.mac-hist-svg text.mac-dia { font-size: 11px; fill: var(--text-muted); }
+.mac-hist-svg rect { fill: rgba(17, 17, 17, 0.35); }
+.mac-hist-svg rect.atual { fill: rgba(17, 17, 17, 0.85); }
+.mac-hist-svg rect.passou { fill: #ef4444; }
+.mac-hist-medias { margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted); }
+.mac-hist-medias b { color: var(--text-main); }
+
+/* Dieta: dois painéis lado a lado, cada um com o seu título dentro */
+.mac-painel {
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    min-width: 0;
+}
+
+.mac-painel .mac-dieta-titulo { margin-bottom: 0.6rem; }
+.mac-form { padding: 0; border: none; background: transparent; }
+.mac-off { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.mac-campo { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.mac-campo > span { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+
+.mac-form select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.88rem;
+}
+
+.mac-linha-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.mac-porcao { display: grid; grid-template-columns: 4rem 1fr; gap: 0.4rem; }
+.mac-form-nums { grid-template-columns: repeat(4, 1fr); }
+.mac-form-nums .mac-campo input { text-align: center; }
+
+.mac-dieta-grupo { margin-bottom: 0.8rem; }
+.mac-dieta-grupo .mac-ref-cab { margin-bottom: 0.3rem; }
+
+@media (max-width: 700px) {
+    .mac-item { grid-template-columns: 1fr auto; }
+    .mac-item .mac-qtd { grid-column: 1; }
+    .mac-item .mac-x { grid-row: 1 / span 3; }
+    .mac-qtd-btn { width: 2.2rem; height: 2.2rem; }
+    .mac-ficha { padding: 0.45rem 0.8rem 0.45rem 0.6rem; font-size: 0.85rem; }
+    .mac-linha-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Barra de adicionar: campo + refeição em botões ---------- */
+
+.mac-add { flex-wrap: wrap; align-items: center; }
+.mac-add .mac-busca { flex: 1 1 16rem; }
+
+.mac-ref-botoes {
+    display: inline-flex;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.mac-ref-btn {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mac-ref-btn.ativo { background: var(--primary); color: var(--primary-text); }
+.mac-sug-topo { margin-top: 0.5rem; }
+
+@media (max-width: 700px) {
+    .mac-ref-botoes { width: 100%; }
+    .mac-ref-btn { flex: 1; padding: 0.55rem 0.3rem; text-align: center; }
+}
+
+/* ---------- Tabela de alimentos ---------- */
+.mac-tab-termo {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 0.88rem;
+}
+.mac-off-titulo { margin-top: 0.6rem; }
+.mac-sug-tabela { border-left: 3px solid var(--warning); }
+.mac-sug-nome em { font-size: 0.72rem; }

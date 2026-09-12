@@ -1,0 +1,208 @@
+/* ==========================================================
+   LAYOUT DO CELULAR
+   ----------------------------------------------------------
+   Tudo aqui só vale em tela estreita (até 700px de largura).
+   No desktop nada muda: a única regra fora do @media esconde
+   a barra de abas, que só existe para o celular.
+
+   Ideia: uma coluna, barra de abas no polegar (rodapé), listas
+   em vez de grades, botões do tamanho de um dedo.
+   ========================================================== */
+
+.mobile-tabs { display: none; }
+
+@media (max-width: 700px) {
+
+    /* ---------- Base ---------- */
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+        padding: 0.75rem 0.75rem calc(4.6rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .container { max-width: none; }
+
+    header { padding-top: 2.6rem; margin-bottom: 0.75rem; }
+    header h1 { font-size: 1.5rem; }
+    header p { display: none; }
+
+    .hamburger-btn { top: 0.75rem; left: 0.75rem; }
+
+    /* minmax(0, 1fr): sem isso, um botão largo demais empurra a
+       coluna inteira para fora da tela. */
+    .grid-layout { gap: 0.9rem; grid-template-columns: minmax(0, 1fr); }
+    .card { min-width: 0; }
+
+    .card {
+        padding: 1rem;
+        border-radius: 12px;
+        gap: 0.75rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .card h2 { font-size: 1.2rem; }
+    .card h3, .overview-heading { font-size: 0.95rem; }
+
+    /* Dedo, não mouse */
+    .btn, button.btn { min-height: 44px; }
+    .btn-sm { min-height: 38px; }
+    input, select, textarea { font-size: 16px; }   /* evita o zoom automático do iPhone */
+
+    /* O menu lateral fica escondido por uma medida fixa (-300px) no
+       desktop. Com a largura nova, sobrava um pedaço à mostra — a
+       "faixa preta" na borda esquerda. Escondido é escondido. */
+    .sidebar { width: min(82vw, 20rem); left: -110vw; }
+    .sidebar.open { left: 0; }
+
+    /* ---------- Barra de abas (rodapé) ---------- */
+
+    .mobile-tabs {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1400;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        padding: 0.3rem 0.25rem calc(0.3rem + env(safe-area-inset-bottom, 0px));
+        background: #111111;
+        border-top: 1px solid rgba(250, 204, 21, 0.25);
+    }
+
+    .mobile-tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.15rem;
+        min-height: 3.2rem;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+        color: rgba(250, 204, 21, 0.55);
+        font-family: inherit;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+    }
+
+    .mobile-tab svg { width: 1.35rem; height: 1.35rem; fill: currentColor; }
+
+    .mobile-tab.active {
+        color: #facc15;
+        background: rgba(250, 204, 21, 0.12);
+    }
+
+    /* A bolha do assistente (só no PC) não pode ficar em cima da barra */
+    .assistente-bolha, .assistente-painel { bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); }
+
+    /* ---------- Início ---------- */
+
+    .overview-top { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+    .overview-treino { margin: 0.25rem 0; }
+    .overview-actions { width: 100%; flex-wrap: wrap; }
+    .overview-actions .btn { flex: 1 1 auto; }
+
+    /* "Sua semana" vira lista: um dia por linha, nome à esquerda */
+    .week-strip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .week-day,
+    .week-strip-compact .week-day {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.6rem;
+        min-height: 0;
+        padding: 0.45rem 0.6rem;
+    }
+
+    /* A regra de 900px do google-style.css deixa a faixa rolando de lado;
+       aqui ela é uma lista, sem rolagem. */
+    .week-strip { overflow-x: visible; padding-bottom: 0; }
+
+    .week-day-head {
+        flex: none;
+        width: 3.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        padding: 0;
+        border-bottom: none;
+        border-right: 1px solid var(--border);
+        padding-right: 0.5rem;
+        align-self: stretch;
+    }
+
+    .week-day-events { flex: 1; min-width: 0; }
+
+    /* ---------- Calendário ---------- */
+
+    .calendar-assessment-form { grid-template-columns: 1fr; }
+
+    /* ---------- Google Tasks / Pendências ---------- */
+
+    .task-actions, .acad-inline-form { flex-wrap: wrap; }
+
+    /* ---------- Academia: lista, hoje primeiro ---------- */
+
+    .acad-grade { grid-template-columns: 1fr; gap: 0.6rem; }
+    .acad-col { min-height: 0; padding: 0.6rem 0.7rem; }
+    .acad-col.is-today { order: -1; }
+    .acad-cab { gap: 0.5rem; }
+    .acad-seta { width: 2.6rem; height: 2.6rem; }
+    .acad-ed-nums-2 { grid-template-columns: 1fr 1fr auto; }
+
+    /* A bolinha do check, do tamanho de um dedo */
+    .acad-col-cab { padding-bottom: 0.4rem; }
+    .acad-col-dia { gap: 0.5rem; font-size: 0.9rem; }
+    .acad-check { width: 1.6rem; height: 1.6rem; }
+    .acad-check.ativo::after { width: 0.4rem; height: 0.75rem; }
+    .acad-ex { padding: 0.45rem 0.5rem; }
+    .acad-ex-nome { font-size: 0.88rem; }
+    .acad-ex-det { font-size: 0.78rem; }
+    .acad-treino-nome { font-size: 0.9rem; padding: 0.35rem 0.5rem; }
+    .acad-remover { width: 2rem; height: 2rem; font-size: 0.9rem; }
+
+    /* ---------- Timer de Foco ---------- */
+
+    .timer-display { font-size: 3.2rem; }
+    #timer-pip { display: none; }   /* o iPhone não tem mini player */
+
+    .timer-controls { flex-wrap: wrap; gap: 0.5rem; }
+    .timer-controls .btn { flex: 1 1 40%; }
+
+    /* Em tela cheia (aba Foco): deixa a barra de abas visível para
+       poder sair por ela, e o botão Sair sempre na tela. */
+    .mobile-tabs { z-index: 100001; }
+
+    #focus-timer.fullscreen-timer {
+        height: auto !important;
+        bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)) !important;
+        padding: 4rem 1rem 1rem !important;
+        overflow-y: auto !important;
+        justify-content: flex-start !important;
+    }
+
+    #focus-timer.fullscreen-timer .timer-display,
+    #focus-timer.fullscreen-timer #timer { font-size: clamp(4rem, 22vw, 6rem) !important; margin: 1rem 0 !important; }
+    #focus-timer.fullscreen-timer h2 { font-size: 1.6rem !important; }
+    #focus-timer.fullscreen-timer .timer-controls { flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; width: 100%; }
+    #focus-timer.fullscreen-timer .timer-controls button { padding: 0.8rem 1rem !important; font-size: 1rem !important; flex: 1 1 40%; }
+    #focus-timer.fullscreen-timer .timer-settings,
+    #focus-timer.fullscreen-timer .pause-stats { font-size: 1rem !important; margin-top: 1rem !important; }
+
+    #exit-focus-btn {
+        position: fixed !important;
+        top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important;
+        left: 0.75rem !important;
+    }
+
+    /* ---------- Desempenho ---------- */
+
+    .performance-header { flex-direction: column; align-items: stretch; }
+}
