@@ -1,0 +1,61 @@
+[
+  {"id": "economist-econ", "nome": "The Economist", "secao": "economia", "lingua": "en", "url": "https://www.economist.com/finance-and-economics/rss.xml"},
+  {"id": "ft-econ", "nome": "Financial Times", "secao": "economia", "lingua": "en", "url": "https://www.ft.com/global-economy?format=rss"},
+  {"id": "bloomberg-econ", "nome": "Bloomberg Economics", "secao": "economia", "lingua": "en", "url": "https://feeds.bloomberg.com/economics/news.rss"},
+  {"id": "cnbc-econ", "nome": "CNBC Economy", "secao": "economia", "lingua": "en", "url": "https://www.cnbc.com/id/20910258/device/rss/rss.html"},
+  {"id": "valor", "nome": "Valor Econômico", "secao": "economia", "lingua": "pt", "url": "https://valor.globo.com/rss/valor/"},
+  {"id": "folha-mercado", "nome": "Folha Mercado", "secao": "economia", "lingua": "pt", "url": "https://feeds.folha.uol.com.br/mercado/rss091.xml"},
+  {"id": "infomoney", "nome": "InfoMoney", "secao": "economia", "lingua": "pt", "url": "https://www.infomoney.com.br/feed/"},
+
+  {"id": "hbr", "nome": "Harvard Business Review", "secao": "negocios", "lingua": "en", "url": "http://feeds.hbr.org/harvardbusiness"},
+  {"id": "economist-business", "nome": "The Economist Business", "secao": "negocios", "lingua": "en", "url": "https://www.economist.com/business/rss.xml"},
+  {"id": "bloomberg", "nome": "Bloomberg Markets", "secao": "negocios", "lingua": "en", "url": "https://feeds.bloomberg.com/markets/news.rss"},
+  {"id": "wsj-business", "nome": "Wall Street Journal", "secao": "negocios", "lingua": "en", "url": "https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml"},
+  {"id": "exame", "nome": "Exame", "secao": "negocios", "lingua": "pt", "url": "https://exame.com/feed/"},
+
+  {"id": "verge", "nome": "The Verge", "secao": "tecnologia", "lingua": "en", "url": "https://www.theverge.com/rss/index.xml"},
+  {"id": "techcrunch", "nome": "TechCrunch", "secao": "tecnologia", "lingua": "en", "url": "https://techcrunch.com/feed/"},
+  {"id": "mit-tr", "nome": "MIT Technology Review", "secao": "tecnologia", "lingua": "en", "url": "https://www.technologyreview.com/feed/"},
+  {"id": "ars", "nome": "Ars Technica", "secao": "tecnologia", "lingua": "en", "url": "https://feeds.arstechnica.com/arstechnica/index"},
+
+  {"id": "foreignpolicy", "nome": "Foreign Policy", "secao": "geopolitica", "lingua": "en", "url": "https://foreignpolicy.com/feed/"},
+  {"id": "foreignaffairs", "nome": "Foreign Affairs", "secao": "geopolitica", "lingua": "en", "url": "https://www.foreignaffairs.com/rss.xml"},
+  {"id": "aljazeera", "nome": "Al Jazeera", "secao": "geopolitica", "lingua": "en", "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+  {"id": "bbc-world", "nome": "BBC World", "secao": "geopolitica", "lingua": "en", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
+  {"id": "economist-intl", "nome": "The Economist International", "secao": "geopolitica", "lingua": "en", "url": "https://www.economist.com/international/rss.xml"},
+  {"id": "wsj-world", "nome": "WSJ World", "secao": "geopolitica", "lingua": "en", "url": "https://feeds.a.dj.com/rss/RSSWorldNews.xml"},
+
+  {"id": "f1com", "nome": "Formula1.com", "secao": "f1", "lingua": "en", "url": "https://www.formula1.com/en/latest/all.xml"},
+  {"id": "motorsport-f1", "nome": "Motorsport.com", "secao": "f1", "lingua": "en", "url": "https://www.motorsport.com/rss/f1/news/"},
+  {"id": "autosport-f1", "nome": "Autosport", "secao": "f1", "lingua": "en", "url": "https://www.autosport.com/rss/f1/news/"},
+  {"id": "bbc-f1", "nome": "BBC F1", "secao": "f1", "lingua": "en", "url": "https://feeds.bbci.co.uk/sport/formula1/rss.xml"},
+  {"id": "racefans", "nome": "RaceFans", "secao": "f1", "lingua": "en", "url": "https://www.racefans.net/feed/"},
+
+  {"id": "espn", "nome": "ESPN", "secao": "esportes", "lingua": "en", "url": "https://www.espn.com/espn/rss/news"},
+  {"id": "espn-soccer", "nome": "ESPN Soccer", "secao": "esportes", "lingua": "en", "url": "https://www.espn.com/espn/rss/soccer/news"},
+  {"id": "athletic", "nome": "The Athletic", "secao": "esportes", "lingua": "en", "url": "https://www.nytimes.com/athletic/rss/news/"},
+  {"id": "bbc-sport", "nome": "BBC Sport", "secao": "esportes", "lingua": "en", "url": "https://feeds.bbci.co.uk/sport/rss.xml"},
+  {"id": "ge", "nome": "ge (Globo Esporte)", "secao": "esportes", "lingua": "pt", "url": "https://ge.globo.com/rss/ge/"},
+
+  {"id": "dutchnews", "nome": "DutchNews", "secao": "holanda", "lingua": "en", "url": "https://www.dutchnews.nl/feed/"},
+  {"id": "nltimes", "nome": "NL Times", "secao": "holanda", "lingua": "en", "url": "https://nltimes.nl/rssfeed2"},
+  {"id": "dutchreview", "nome": "DutchReview", "secao": "holanda", "lingua": "en", "url": "https://www.dutchreview.com/feed/"},
+
+  {"id": "g1", "nome": "G1", "secao": "brasil", "lingua": "pt", "url": "https://g1.globo.com/rss/g1/"},
+  {"id": "folha", "nome": "Folha de S.Paulo", "secao": "brasil", "lingua": "pt", "url": "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml"},
+  {"id": "estadao", "nome": "Estadão", "secao": "brasil", "lingua": "pt", "url": "https://www.estadao.com.br/arc/outboundfeeds/rss/?outputType=xml"},
+  {"id": "cnnbrasil", "nome": "CNN Brasil", "secao": "brasil", "lingua": "pt", "url": "https://www.cnnbrasil.com.br/feed/"},
+  {"id": "jovempan", "nome": "Jovem Pan", "secao": "brasil", "lingua": "pt", "url": "https://jovempan.com.br/feed"},
+
+  {"id": "nyt-us", "nome": "New York Times", "secao": "eua", "lingua": "en", "url": "https://rss.nytimes.com/services/xml/rss/nyt/US.xml"},
+  {"id": "npr", "nome": "NPR", "secao": "eua", "lingua": "en", "url": "https://feeds.npr.org/1001/rss.xml"},
+  {"id": "cbs", "nome": "CBS News", "secao": "eua", "lingua": "en", "url": "https://www.cbsnews.com/latest/rss/main"},
+  {"id": "nbc", "nome": "NBC News", "secao": "eua", "lingua": "en", "url": "https://feeds.nbcnews.com/nbcnews/public/news"},
+  {"id": "economist-us", "nome": "The Economist US", "secao": "eua", "lingua": "en", "url": "https://www.economist.com/united-states/rss.xml"},
+
+  {"id": "poder360", "nome": "Poder360", "secao": "politica", "lingua": "pt", "url": "https://www.poder360.com.br/feed/"},
+  {"id": "folha-poder", "nome": "Folha Poder", "secao": "politica", "lingua": "pt", "url": "https://feeds.folha.uol.com.br/poder/rss091.xml"},
+  {"id": "politico", "nome": "Politico (EUA)", "secao": "politica", "lingua": "en", "url": "https://rss.politico.com/politics-news.xml"},
+  {"id": "politico-eu", "nome": "Politico Europe", "secao": "politica", "lingua": "en", "url": "https://www.politico.eu/feed/"},
+  {"id": "economist-europe", "nome": "The Economist Europe", "secao": "politica", "lingua": "en", "url": "https://www.economist.com/europe/rss.xml"}
+]

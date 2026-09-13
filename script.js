@@ -274,7 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'calendar-view':    ['calendar-view'],
         'ai-generator':     ['ai-generator'],
         'performance-view': ['performance-view'],
-        'academia-view':    ['academia-view']
+        'academia-view':    ['academia-view'],
+        'noticias-view':    ['noticias-view']
     };
 
     /* Todos os blocos que a navegação controla. */
@@ -300,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target === 'ai-generator' && typeof window.renderSchedulerTasks === 'function') window.renderSchedulerTasks();
         if (target === 'performance-view' && typeof renderPerformanceChart === 'function') renderPerformanceChart();
         if (target === 'academia-view' && window.Academia) window.Academia.renderTudo();
+        if (target === 'noticias-view' && window.Noticias) window.Noticias.aoAbrir();
         if (typeof window.onTabShown === 'function') window.onTabShown(target);
     };
 

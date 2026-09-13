@@ -31,7 +31,8 @@ window.ESESync = (() => {
        chaves de sessão do Google são de cada aparelho. */
     const CHAVES = [
         'eseTasks', 'eseAssessments', 'eseSubjectsByBimester', 'eseGlobalBimester',
-        'eseStudyHistory', 'eseAcademia', 'eseGoogleSettings', 'eseMetas', 'esePlano', 'eseMacros'
+        'eseStudyHistory', 'eseAcademia', 'eseGoogleSettings', 'eseMetas', 'esePlano', 'eseMacros',
+        'eseNoticiasFontes'
     ];
 
     const DRIVE = 'https://www.googleapis.com/drive/v3/files';

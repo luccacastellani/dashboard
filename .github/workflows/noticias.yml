@@ -1,0 +1,49 @@
+# Robô das notícias: de hora em hora lê os feeds dos jornais e publica
+# noticias.json no ramo "noticias" (sempre um commit só, no nome da dona
+# do repositório). O dashboard lê esse arquivo pelo raw.githubusercontent.com.
+name: noticias
+
+on:
+  schedule:
+    - cron: "17 * * * *"      # todo minuto 17 de cada hora (UTC)
+  workflow_dispatch:           # botão "Run workflow" na aba Actions
+  push:
+    branches: [main]
+    paths: ["noticias/**", ".github/workflows/noticias.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: noticias
+  cancel-in-progress: true
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ler os feeds e montar noticias.json
+        run: python noticias/coletar.py
+
+      - name: Publicar no ramo "noticias" (1 commit só, no nome da autora de main)
+        run: |
+          NOME="$(git log -1 --format=%an)"
+          EMAIL="$(git log -1 --format=%ae)"
+          mkdir -p /tmp/pub
+          cp noticias.json /tmp/pub/
+          cd /tmp/pub
+          git init -q -b noticias
+          git config user.name "$NOME"
+          git config user.email "$EMAIL"
+          git add noticias.json
+          git commit -q -m "Notícias"
+          git push -q --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" noticias
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
