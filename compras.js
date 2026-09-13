@@ -178,6 +178,25 @@ window.Compras = (() => {
         return LOJAS.map(([id, nome]) => ({ loja: id, nome, linhas: linhas.filter((l) => l.produto.loja === id) })).filter((g) => g.linhas.length);
     };
 
+    const chave = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const palavras = (t) => chave(t).split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+
+    /* Qual item da Dieta combina com "AH Havermout 500 g"? O que tiver mais palavras em comum. */
+    const sugerirDieta = (nomeProduto, dieta) => {
+        const ps = new Set(palavras(nomeProduto));
+        let melhor = null, pontos = 0;
+        for (const item of dieta || []) {
+            const n = palavras(item.nome).filter((w) => ps.has(w) || [...ps].some((q) => q.startsWith(w) || w.startsWith(q))).length;
+            if (n > pontos) { pontos = n; melhor = item; }
+        }
+        return melhor;
+    };
+
+    /* "Nutella" + marca "Nutella" -> "Nutella"; "Havermout" + "AH" -> "Havermout AH" */
+    const nomeComMarca = (r) => (r.marca && !chave(r.nome).includes(chave(r.marca)) ? `${r.nome} ${r.marca}` : r.nome);
+
+    const produtoPorCodigo = (codigo, produtos) => (produtos || []).find((p) => p.codigo && p.codigo === String(codigo || '').trim()) || null;
+
     const fmtQtd = (qtd, unidade) => {
         if (unidade === 'g' && qtd >= 1000) return `${Math.round(qtd / 100) / 10} kg`;
         if (unidade === 'ml' && qtd >= 1000) return `${Math.round(qtd / 100) / 10} L`;
@@ -237,7 +256,8 @@ window.Compras = (() => {
 
     /* ==================== DESENHO ==================== */
 
-    const estado = { tela: 'lista', perguntando: false, editando: null, pacotes: {}, mensagem: '', rotulo: null };
+    const estado = { tela: 'lista', perguntando: false, editando: null, pacotes: {}, mensagem: '', rotulo: null, bipe: null };
+    /* bipe: null | { fase: 'lendo' | 'buscando' | 'novo' | 'feito', codigo, nome, embalagem, loja, dietaId, produto, compraId, msg } */
 
     const telaLista = () => {
         const m = macros();
@@ -286,14 +306,78 @@ window.Compras = (() => {
                 ${g.linhas.map(linha).join('')}
             </div>`).join('') : (dados.produtos.length
             ? '<div class="com-vazio">Tudo em casa por enquanto. A lista enche sozinha conforme você registra as refeições no Macros.</div>'
-            : '<div class="com-vazio">Cadastre os seus produtos em <strong>Produtos</strong> (uma vez só) e a lista aparece aqui.</div>');
+            : '');
+
+        const b = estado.bipe;
+        const cameraBox = `
+            <div id="com-camera" class="mac-camera" style="display:none">
+                <video id="com-camera-video" playsinline muted></video>
+                <div class="mac-camera-mira" aria-hidden="true"></div>
+                <div class="mac-camera-rodape">
+                    <span id="com-camera-msg">Aponte para o código de barras</span>
+                    <button type="button" class="btn btn-secondary btn-sm" data-acao="camera-fechar">Fechar</button>
+                </div>
+            </div>`;
+        let bipe = '';
+        if (b && b.fase === 'buscando') bipe = `<div class="com-bipe"><div class="com-vazio">Código ${esc(b.codigo)} — procurando o produto…</div></div>`;
+        else if (b && b.fase === 'feito') bipe = `
+            <div class="com-bipe com-bipe-ok">
+                <div class="com-bipe-txt"><strong>✔ ${esc(b.produto.nome)}</strong> — comprado ${b.pacotes} × ${fmtQtd(b.produto.embalagem.qtd, b.produto.embalagem.unidade)}. Em casa agora: ~${fmtQtd(emCasa(b.produto, dados, m), b.produto.embalagem.unidade)}.</div>
+                <div class="com-bipe-btns">
+                    <button type="button" class="btn btn-primary btn-sm" data-acao="camera">📷 Bipar o próximo</button>
+                    <button type="button" class="mac-mini" data-acao="desfazer-bipe">desfazer</button>
+                    <button type="button" class="mac-mini" data-acao="fechar-bipe">fechar</button>
+                </div>
+            </div>`;
+        else if (b && b.fase === 'novo') {
+            const dietaOpts = ['<option value="">— nenhum (só entra na lista) —</option>']
+                .concat((m.dieta || []).map((i) => `<option value="${i.id}" ${b.dietaId === i.id ? 'selected' : ''}>${esc(i.nome)} (${i.porcao.qtd} ${esc(i.porcao.unidade)})</option>`)).join('');
+            bipe = `
+            <div class="com-bipe">
+                <div class="com-bipe-txt"><strong>Produto novo</strong> <span class="mac-dica">${b.msg ? esc(b.msg) : 'primeira vez que aparece — confira e pronto, nunca mais pergunto'}</span></div>
+                <form id="com-bipe-form" class="com-bipe-form" autocomplete="off">
+                    <label class="mac-campo"><span>Nome</span><input type="text" id="com-b-nome" value="${esc(b.nome || '')}" required></label>
+                    <div class="mac-linha-2">
+                        <label class="mac-campo"><span>Embalagem</span>
+                            <span class="mac-porcao">
+                                <input type="text" inputmode="decimal" id="com-b-emb-qtd" value="${esc(b.embalagem ? b.embalagem.qtd : '')}" placeholder="500" required>
+                                <select id="com-b-emb-un">${UNIDADES.map((u) => `<option value="${u}" ${(b.embalagem ? b.embalagem.unidade : 'g') === u ? 'selected' : ''}>${u === 'unidade' ? 'unidades' : u}</option>`).join('')}</select>
+                            </span>
+                        </label>
+                        <label class="mac-campo"><span>Item da Dieta <em>para descontar o que você come</em></span><select id="com-b-dieta">${dietaOpts}</select></label>
+                    </div>
+                    <div class="mac-campo"><span>Onde você compra</span>
+                        <div class="com-lojas">${LOJAS.map(([id, nome]) => `<button type="button" class="com-loja-btn ${(b.loja || 'lidl') === id ? 'ativo' : ''}" data-acao="bipe-loja" data-loja="${id}">${nome}</button>`).join('')}</div>
+                    </div>
+                    <div class="mac-form-acoes">
+                        <button type="submit" class="btn btn-primary btn-sm">Cadastrar e marcar como comprado</button>
+                        <button type="button" class="btn btn-secondary btn-sm" data-acao="bipe-so-cadastrar">Só cadastrar</button>
+                        <button type="button" class="mac-mini" data-acao="fechar-bipe">cancelar</button>
+                    </div>
+                </form>
+            </div>`;
+        }
+
+        const comoFunciona = !dados.produtos.length ? `
+            <div class="com-passos">
+                <div class="com-passo"><b>1</b><span><strong>Bipe</strong> o código de barras de cada produto quando chegar do mercado. Na primeira vez ele entra no cadastro (nome e embalagem vêm sozinhos); nas seguintes, conta como compra.</span></div>
+                <div class="com-passo"><b>2</b><span><strong>Registre</strong> o que come no Macros, como já faz. Cada porção sai do "em casa".</span></div>
+                <div class="com-passo"><b>3</b><span>A <strong>lista</strong> aparece aqui sozinha, por loja, quando algo está acabando. No mercado, toque em <strong>Comprei</strong>.</span></div>
+                <div class="com-passo"><b>+</b><span>Sem código de barras (frango, carne)? <button type="button" class="mac-mini" data-tela="produtos">cadastre na mão</button>.</span></div>
+            </div>` : '';
 
         return `
             <div class="com-cab">
                 <div class="com-cab-txt"><strong>${totalItens ? `${totalItens} ${totalItens === 1 ? 'item' : 'itens'} para comprar` : 'Lista vazia'}</strong>
                     ${duvidas.length ? `<span class="mac-dica">${duvidas.length} em dúvida</span>` : ''}</div>
-                <button type="button" class="btn btn-primary btn-sm" data-acao="perguntas">🛒 Vou ao mercado</button>
+                <div class="com-cab-btns">
+                    <button type="button" class="btn btn-primary btn-sm" data-acao="camera">📷 Bipar produto</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-acao="perguntas">🛒 Vou ao mercado</button>
+                </div>
             </div>
+            ${cameraBox}
+            ${bipe}
+            ${comoFunciona}
             ${perguntas}
             ${lista}
             <div class="com-loja">
@@ -342,11 +426,11 @@ window.Compras = (() => {
                             <label class="mac-campo"><span>Por semana <em>usado enquanto não há histórico</em></span><span class="mac-porcao com-semana"><input type="text" inputmode="decimal" id="com-f-semana" value="${esc(e.porSemana || emb.qtd || '')}"><span class="com-un">${emb.unidade === 'unidade' ? 'unidades' : (emb.unidade || 'g')}</span></span></label>
                             <label class="mac-campo"><span>Código de barras <em>opcional</em></span><span class="mac-porcao com-codigo"><input type="text" inputmode="numeric" id="com-f-codigo" value="${esc(e.codigo || '')}" placeholder="ou leia com a câmera"><button type="button" class="btn btn-secondary btn-sm" data-acao="camera">📷</button></span></label>
                         </div>
-                        <div id="com-camera" class="mac-camera" style="display:none">
-                            <video id="com-camera-video" playsinline muted></video>
+                        <div id="com-camera-p" class="mac-camera" style="display:none">
+                            <video id="com-camera-p-video" playsinline muted></video>
                             <div class="mac-camera-mira" aria-hidden="true"></div>
                             <div class="mac-camera-rodape">
-                                <span id="com-camera-msg">Aponte para o código de barras</span>
+                                <span id="com-camera-p-msg">Aponte para o código de barras</span>
                                 <button type="button" class="btn btn-secondary btn-sm" data-acao="camera-fechar">Fechar</button>
                             </div>
                         </div>
@@ -401,6 +485,56 @@ window.Compras = (() => {
         codigo: $('com-f-codigo').value
     });
 
+    /* ---- Bipe na lista: código conhecido = compra; desconhecido = cadastro rápido ---- */
+
+    const lerBipeForm = () => ({
+        nome: ($('com-b-nome') || {}).value || '',
+        embalagem: { qtd: num(($('com-b-emb-qtd') || {}).value, 0), unidade: ($('com-b-emb-un') || {}).value || 'g' },
+        dietaId: ($('com-b-dieta') || {}).value || null
+    });
+
+    const bipar = async (codigo) => {
+        const conhecido = produtoPorCodigo(codigo, dados.produtos);
+        if (conhecido) {
+            comprei(conhecido.id, 1);
+            const compra = dados.compras[dados.compras.length - 1];
+            estado.bipe = { fase: 'feito', codigo, produto: conhecido, pacotes: 1, compraId: compra.id };
+            render();
+            return;
+        }
+        estado.bipe = { fase: 'buscando', codigo };
+        render();
+        const m = macros();
+        try {
+            const r = await window.Macros.buscarRotulo(codigo);
+            const nome = nomeComMarca(r);
+            const emb = interpretarEmbalagem(r.quantidade);
+            estado.bipe = { fase: 'novo', codigo, nome, embalagem: emb, loja: 'lidl', dietaId: (sugerirDieta(nome, m.dieta) || {}).id || null,
+                msg: emb ? '' : 'não veio o tamanho da embalagem — preencha' };
+        } catch (err) {
+            estado.bipe = { fase: 'novo', codigo, nome: '', embalagem: null, loja: 'lidl', dietaId: null, msg: `${err.message} Preencha o nome e a embalagem; o código fica guardado.` };
+        }
+        render();
+        const campo = $('com-b-nome');
+        if (campo && !campo.value) campo.focus();
+    };
+
+    const cadastrarDoBipe = (marcarComprado) => {
+        const b = estado.bipe;
+        if (!b) return;
+        const f = lerBipeForm();
+        if (!f.nome.trim() || !f.embalagem.qtd) { estado.bipe = { ...b, ...f, msg: 'Preencha o nome e a embalagem.' }; render(); return; }
+        const id = guardarProduto({ nome: f.nome, dietaId: f.dietaId, loja: b.loja || 'lidl', codigo: b.codigo, embalagem: f.embalagem, porSemana: f.embalagem.qtd });
+        const produto = dados.produtos.find((p) => p.id === id);
+        if (marcarComprado) {
+            comprei(id, 1);
+            estado.bipe = { fase: 'feito', codigo: b.codigo, produto, pacotes: 1, compraId: dados.compras[dados.compras.length - 1].id };
+        } else {
+            estado.bipe = null;
+        }
+        render();
+    };
+
     const ligar = () => {
         const box = $('acad-compras');
         if (!box) return;
@@ -440,10 +574,20 @@ window.Compras = (() => {
                 if (p && confirm(`Apagar "${p.nome}" da lista de produtos?`)) { apagarProduto(id); if (estado.editando && estado.editando.id === id) estado.editando = null; render(); }
             }
             else if (acao === 'desfazer') { desfazerCompra(id); render(); }
+            else if (acao === 'camera' && estado.tela === 'lista') {
+                if (!window.Macros || !window.Macros.lerCodigoBarras) return;
+                estado.bipe = null; estado.perguntando = false;
+                render();
+                window.Macros.lerCodigoBarras({ boxId: 'com-camera', videoId: 'com-camera-video', msgId: 'com-camera-msg', aoLer: bipar });
+            }
+            else if (acao === 'bipe-loja') { if (estado.bipe) { estado.bipe = { ...estado.bipe, ...lerBipeForm(), loja: alvo.dataset.loja }; render(); } }
+            else if (acao === 'bipe-so-cadastrar') { cadastrarDoBipe(false); }
+            else if (acao === 'desfazer-bipe') { if (estado.bipe && estado.bipe.compraId) desfazerCompra(estado.bipe.compraId); estado.bipe = null; render(); }
+            else if (acao === 'fechar-bipe') { estado.bipe = null; render(); }
             else if (acao === 'camera') {
                 if (!window.Macros || !window.Macros.lerCodigoBarras) return;
                 window.Macros.lerCodigoBarras({
-                    boxId: 'com-camera', videoId: 'com-camera-video', msgId: 'com-camera-msg',
+                    boxId: 'com-camera-p', videoId: 'com-camera-p-video', msgId: 'com-camera-p-msg',
                     aoLer: async (codigo) => {
                         const campo = $('com-f-codigo');
                         if (campo) campo.value = codigo;
@@ -454,7 +598,7 @@ window.Compras = (() => {
                         try {
                             const r = await window.Macros.buscarRotulo(codigo);
                             const emb = interpretarEmbalagem(r.quantidade);
-                            const f = { ...lerForm(), codigo, nome: lerForm().nome || `${r.nome}${r.marca ? ' ' + r.marca : ''}` };
+                            const f = { ...lerForm(), codigo, nome: lerForm().nome || nomeComMarca(r) };
                             if (emb) { f.embalagem = emb; if (!f.porSemana) f.porSemana = emb.qtd; }
                             estado.editando = f;
                             estado.mensagem = emb ? `Achei: ${r.nome} — embalagem ${fmtQtd(emb.qtd, emb.unidade)}. Confira e cadastre.` : `Achei: ${r.nome}. Não veio o tamanho da embalagem — preencha.`;
@@ -471,6 +615,7 @@ window.Compras = (() => {
 
         box.addEventListener('submit', (e) => {
             const form = e.target;
+            if (form.id === 'com-bipe-form') { e.preventDefault(); cadastrarDoBipe(true); return; }
             if (form.id === 'com-form') {
                 e.preventDefault();
                 const p = lerForm();
@@ -509,8 +654,8 @@ window.Compras = (() => {
     }
 
     return {
-        interpretarEmbalagem, consumoDesde, emCasa, porSemana, naDuvida, linhaDaLista, montarLista, fmtQtd,
-        guardarProduto, apagarProduto, comprei, desfazerCompra, responder, adicionarAvulso, tirarAvulso,
+        interpretarEmbalagem, consumoDesde, emCasa, porSemana, naDuvida, linhaDaLista, montarLista, fmtQtd, sugerirDieta, produtoPorCodigo,
+        guardarProduto, apagarProduto, comprei, desfazerCompra, responder, adicionarAvulso, tirarAvulso, bipar,
         render: () => { carregar(); render(); },
         _dados: () => dados, _definirDados: (d) => { dados = migrar(d); }
     };
