@@ -127,8 +127,19 @@ window.Macros = (() => {
         if (kcal == null || !isFinite(kcal)) return null;
         return {
             nome, marca: String(p.brands || '').split(',')[0].trim(), codigo: String(p.code || ''),
+            quantidade: String(p.quantity || '').trim(),
             por100g: { kcal: Math.round(kcal), p: r1(num(n['proteins_100g'])), c: r1(num(n['carbohydrates_100g'])), g: r1(num(n['fat_100g'])) }
         };
+    };
+
+    /* Só o rótulo (nome, marca, embalagem), sem exigir tabela nutricional.
+       É o que a lista de Compras precisa. */
+    const lerRotuloOFF = (json) => {
+        const p = json && json.status === 1 ? json.product : null;
+        if (!p) return null;
+        const nome = String(p.product_name_pt || p.product_name || p.product_name_en || '').trim();
+        if (!nome) return null;
+        return { nome, marca: String(p.brands || '').split(',')[0].trim(), codigo: String(p.code || ''), quantidade: String(p.quantity || '').trim() };
     };
 
     /* ==================== ALTERAÇÕES ==================== */
@@ -216,6 +227,14 @@ window.Macros = (() => {
         return lido;
     };
 
+    const buscarRotulo = async (codigo) => {
+        const r = await fetch(`${OFF}/api/v0/product/${encodeURIComponent(String(codigo).trim())}.json`);
+        if (!r.ok) throw new Error('Open Food Facts não respondeu.');
+        const lido = lerRotuloOFF(await r.json());
+        if (!lido) throw new Error('Produto não encontrado no Open Food Facts.');
+        return lido;
+    };
+
     /* Busca por nome: o Open Food Facts não deixa páginas de outros
        sites chamarem a busca direto (CORS), então no PC é o servidor
        do dashboard que pergunta. No celular, só código de barras. */
@@ -246,14 +265,20 @@ window.Macros = (() => {
         document.head.appendChild(tag);
     });
 
+    let cameraBoxId = 'mac-camera';
+
     const fecharCamera = () => {
         if (leitor) { try { leitor.reset(); } catch { /* ignora */ } leitor = null; }
-        const box = $('mac-camera');
+        const box = $(cameraBoxId);
         if (box) box.style.display = 'none';
     };
 
-    const abrirCamera = async () => {
-        const box = $('mac-camera'), video = $('mac-camera-video'), msg = $('mac-camera-msg');
+    /* opcoes: { boxId, videoId, msgId, aoLer(codigo) } — sem opções, é o
+       leitor da Dieta. A aba Compras usa a mesma função com os ids dela. */
+    const abrirCamera = async (opcoes) => {
+        const o = opcoes || {};
+        cameraBoxId = o.boxId || 'mac-camera';
+        const box = $(cameraBoxId), video = $(o.videoId || 'mac-camera-video'), msg = $(o.msgId || 'mac-camera-msg');
         if (!box || !video) return;
         box.style.display = '';
         msg.textContent = 'Carregando o leitor…';
@@ -272,6 +297,7 @@ window.Macros = (() => {
                 if (!resultado) return;
                 const codigo = resultado.getText();
                 fecharCamera();
+                if (o.aoLer) { o.aoLer(codigo); return; }
                 const termo = $('mac-off-termo');
                 if (termo) termo.value = codigo;
                 const btn = document.querySelector('[data-acao="buscar-off"]');
@@ -714,10 +740,12 @@ window.Macros = (() => {
         if (!abas.length) return;
         const mostrar = (aba) => {
             abas.forEach((b) => b.classList.toggle('active', b.dataset.aba === aba));
-            const t = $('acad-treinos'), m = $('acad-macros');
-            if (t) t.style.display = aba === 'macros' ? 'none' : '';
+            const t = $('acad-treinos'), m = $('acad-macros'), c = $('acad-compras');
+            if (t) t.style.display = aba === 'treinos' ? '' : 'none';
             if (m) m.style.display = aba === 'macros' ? '' : 'none';
+            if (c) c.style.display = aba === 'compras' ? '' : 'none';
             if (aba === 'macros') render();
+            if (aba === 'compras' && window.Compras) window.Compras.render();
             try { localStorage.setItem('eseAcademiaAba', aba); } catch { /* ignora */ }
         };
         abas.forEach((b) => b.addEventListener('click', () => mostrar(b.dataset.aba)));
@@ -735,7 +763,8 @@ window.Macros = (() => {
     return {
         escalar, multiplicar, totais, serie7, diaDe, filtrarDieta, lerProdutoOFF,
         definirMetas, adicionarNaDieta, editarNaDieta, apagarDaDieta, registrar, registrarLivre, remover, diminuir,
-        buscarPorCodigo, buscarPorNome, render,
+        buscarPorCodigo, buscarPorNome, buscarRotulo, lerRotuloOFF, render,
+        lerCodigoBarras: abrirCamera, fecharCamera,
         _dados: () => dados, _definirDados: (d) => { dados = migrar(d); }
     };
 })();

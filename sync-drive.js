@@ -32,7 +32,7 @@ window.ESESync = (() => {
     const CHAVES = [
         'eseTasks', 'eseAssessments', 'eseSubjectsByBimester', 'eseGlobalBimester',
         'eseStudyHistory', 'eseAcademia', 'eseGoogleSettings', 'eseMetas', 'esePlano', 'eseMacros',
-        'eseNoticiasFontes'
+        'eseNoticiasFontes', 'eseCompras'
     ];
 
     const DRIVE = 'https://www.googleapis.com/drive/v3/files';

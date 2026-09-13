@@ -1,0 +1,149 @@
+/* ==========================================================
+   COMPRAS — lista por loja, perguntas, produtos
+   (reaproveita .mac-telas, .mac-painel, .mac-form, .mac-camera do Macros)
+   ========================================================== */
+
+.com-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.9rem;
+}
+
+.com-cab-txt { display: flex; align-items: baseline; gap: 0.6rem; }
+
+.com-loja { margin-bottom: 1rem; }
+
+.com-loja-nome {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.35rem;
+    padding-left: 0.6rem;
+    border-left: 4px solid var(--border);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.com-loja-nome.ah { border-left-color: #0a6ab8; }
+.com-loja-nome.lidl { border-left-color: #f5c400; }
+.com-loja-nome > span { font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+.com-linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.55rem 0.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.com-linha:last-of-type { border-bottom: none; }
+.com-linha-info { display: flex; flex-direction: column; min-width: 0; }
+.com-linha-nome { font-weight: 600; }
+.com-linha-det { font-size: 0.74rem; color: var(--text-muted); }
+
+.com-linha-acoes { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
+.com-n { min-width: 1.4rem; text-align: center; font-weight: 700; }
+
+.com-comprei {
+    margin-left: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--primary);
+    color: var(--primary-text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.com-comprei:hover { background: var(--primary-hover); }
+
+.com-avulso-form { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.com-avulso-form input {
+    flex: 1;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    font-family: inherit;
+    font-size: 0.86rem;
+}
+
+.com-vazio { padding: 1.25rem 0.5rem; text-align: center; font-size: 0.88rem; color: var(--text-muted); }
+
+/* ---------- Perguntas ("Vou ao mercado") ---------- */
+
+.com-perguntas {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.com-perguntas-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+
+.com-pergunta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.com-pergunta:last-child { border-bottom: none; }
+.com-pergunta-nome { font-weight: 600; }
+.com-pergunta-nome em { font-size: 0.74rem; font-weight: 400; color: var(--text-muted); }
+.com-pergunta-btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
+
+.com-resp {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.com-resp:hover { background: rgba(0, 0, 0, 0.08); }
+.com-resp-acabou { border-color: var(--danger); color: var(--danger); }
+
+/* ---------- Produtos ---------- */
+
+.com-prod {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.35rem 0.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 0.88rem;
+}
+
+.com-prod-nome em { font-size: 0.74rem; font-style: normal; color: var(--text-muted); }
+.com-prod-acoes { display: flex; gap: 0.6rem; flex-shrink: 0; }
+.com-form { display: flex; flex-direction: column; gap: 0.5rem; }
+.com-form .mac-campo > span em { font-weight: 400; text-transform: none; letter-spacing: 0; font-style: normal; }
+.com-codigo { grid-template-columns: 1fr auto; }
+.com-semana { grid-template-columns: 5rem auto; align-items: center; }
+.com-un { align-self: center; font-size: 0.8rem; color: var(--text-muted); }
+.com-hist-titulo { margin-top: 1rem; }
+.com-hist { display: flex; justify-content: space-between; padding: 0.2rem 0.2rem; font-size: 0.8rem; color: var(--text-muted); }
+
+/* ---------- Celular ---------- */
+
+@media (max-width: 700px) {
+    .com-linha { flex-wrap: wrap; }
+    .com-linha-acoes { width: 100%; justify-content: flex-end; }
+    .com-pergunta { flex-direction: column; align-items: flex-start; }
+}
