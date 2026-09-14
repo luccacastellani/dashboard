@@ -212,6 +212,13 @@
     overflow-wrap: anywhere;
 }
 
+.week-event-place {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
 .week-event-assessment {
     border-left-color: var(--danger);
     background: rgba(185, 28, 28, 0.10);
@@ -739,4 +746,46 @@
 /* O seletor de bimestre dentro do Cronograma precisa de ar embaixo. */
 .cronograma-col .semester-selector {
     margin-bottom: 1rem;
+}
+
+/* ---------- Agenda do Google na grade mensal ---------- */
+
+.calendar-event {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2px;
+    padding: 2px 4px;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.85);
+    font-size: 0.7rem;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.calendar-event-time { font-weight: 700; color: var(--text-muted); font-size: 0.65rem; }
+.calendar-event-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.calendar-event-place { color: var(--text-muted); font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.calendar-agenda-nota {
+    margin: 0.4rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.btn-linkedin {
+    background: #0a66c2;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(10, 102, 194, 0.35);
+}
+
+.btn-linkedin:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 14px rgba(10, 102, 194, 0.45);
+}
+
+.btn-linkedin:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }

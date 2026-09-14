@@ -31,6 +31,9 @@ window.ESE_CONFIG = {
     /* Link do Claude (abre uma conversa nova). */
     CLAUDE_URL: 'https://claude.ai/new',
 
+    /* Link do LinkedIn. */
+    LINKEDIN_URL: 'https://www.linkedin.com/feed/',
+
     /* Link do Gmail. */
     GMAIL_URL: 'https://mail.google.com/mail/u/0/#inbox',
     /* Link do e-mail da faculdade (Outlook). */

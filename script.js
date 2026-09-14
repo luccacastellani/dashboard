@@ -1058,8 +1058,9 @@ window.renderCalendar = () => {
         new Date(year, month + 1, 0).getDate();
 
 
-    const todayStr =
-        new Date().toISOString().split('T')[0];
+    const todayStr = window.ESEDates
+        ? window.ESEDates.todayString()
+        : new Date().toISOString().split('T')[0];
 
 
     /*
@@ -1103,6 +1104,26 @@ window.renderCalendar = () => {
 
         dayDiv.innerHTML =
             `<div class="day-num">${i}</div>`;
+
+
+        /* ==========================
+           AGENDA DO GOOGLE (aulas etc.)
+           ========================== */
+
+        if (window.GoogleCalendar) {
+            window.GoogleCalendar.eventsOn(cellDateStr).forEach((e) => {
+                const evDiv = document.createElement('div');
+                evDiv.className = 'calendar-event';
+                evDiv.style.borderLeftColor = e.color || '';
+                const lugar = e.location && window.lugarCurto ? window.lugarCurto(e.location) : (e.location || '');
+                evDiv.title = e.title + (e.location ? ' · ' + e.location : '') + (e.calendarTitle ? ' (' + e.calendarTitle + ')' : '');
+                evDiv.innerHTML =
+                    `<span class="calendar-event-time">${e.allDay ? 'dia todo' : window.escapeHtml(e.startLabel)}</span>`
+                    + `<span class="calendar-event-title">${window.escapeHtml(e.title)}</span>`
+                    + (lugar ? `<span class="calendar-event-place">📍 ${window.escapeHtml(lugar)}</span>` : '');
+                dayDiv.appendChild(evDiv);
+            });
+        }
 
 
         /* ==========================

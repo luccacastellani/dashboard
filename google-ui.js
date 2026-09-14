@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLink('gemini-link', Auth.readSettings().geminiUrl, 'https://gemini.google.com/app');
         setLink('canvas-link', cfg.CANVAS_URL, 'https://canvas.eur.nl');
         setLink('claude-link', cfg.CLAUDE_URL, 'https://claude.ai/new');
+        setLink('linkedin-link', cfg.LINKEDIN_URL, 'https://www.linkedin.com/feed/');
         setLink('gmail-card', cfg.GMAIL_URL, 'https://mail.google.com/mail/u/0/#inbox');
         setLink('outlook-card', cfg.OUTLOOK_URL, 'https://outlook.office.com/mail/');
     };
@@ -152,6 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    /* "Polak Building, Room 2-07, Burgemeester Oudlaan 50, Rotterdam" -> "Polak Building, Room 2-07".
+       O Google costuma mandar o endereço inteiro; a primeira parte é o que interessa. */
+    const lugarCurto = (loc) => {
+        const partes = String(loc || '').split(',').map((p) => p.trim()).filter(Boolean);
+        if (!partes.length) return '';
+        const util = partes.filter((p) => !/\d{4}\s?[A-Z]{2}|rotterdam|netherlands|nederland|oudlaan/i.test(p));
+        return (util.length ? util : partes).slice(0, 2).join(', ');
+    };
+
+    window.lugarCurto = lugarCurto;
+
     const renderWeekStrip = (container, options) => {
         if (!container) return;
         const compact = Boolean(options && options.compact);
@@ -171,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return '<div class="week-event" style="border-left-color:' + esc(e.color) + '" title="' + title + '">'
                     + '<span class="week-event-time">' + esc(time) + '</span>'
                     + '<span class="week-event-title">' + esc(e.title) + '</span>'
+                    + (e.location ? '<span class="week-event-place">📍 ' + esc(lugarCurto(e.location)) + '</span>' : '')
                     + '</div>';
             }).join('');
 

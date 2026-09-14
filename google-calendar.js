@@ -121,12 +121,12 @@ window.GoogleCalendar = (() => {
             .flatMap((raw) => expandToDays(raw, calendar));
     };
 
-    /* Busca uma janela ampla (semana anterior até 6 semanas à frente),
-       para a faixa semanal e a grade mensal usarem o mesmo cache.      */
+    /* Busca uma janela ampla (5 semanas para trás, 13 para a frente), para a
+       faixa semanal e a grade mensal usarem o mesmo cache.               */
     const fetchRange = async (anchorDate = new Date()) => {
         const monday = D.startOfWeek(anchorDate);
-        const timeMin = D.addDays(monday, -14);
-        const timeMax = D.addDays(monday, 56);
+        const timeMin = D.addDays(monday, -35);
+        const timeMax = D.addDays(monday, 91);
 
         const calendars = await fetchCalendars();
 
