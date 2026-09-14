@@ -286,3 +286,11 @@
         bottom: 1rem;
     }
 }
+
+/* ---------- Respostas em markdown (Claude) ---------- */
+.assist-md p { margin: 0 0 0.35rem; }
+.assist-md p:last-child { margin-bottom: 0; }
+.assist-md ul { margin: 0.2rem 0 0.4rem 1.1rem; padding: 0; }
+.assist-md li { margin: 0.1rem 0; }
+.assist-md a { color: var(--warning); }
+.assist-cab-btn:disabled { opacity: 0.4; cursor: not-allowed; }

@@ -1,9 +1,9 @@
 /* ==========================================================
-   GOOGLE CALENDAR  (SOMENTE LEITURA)
+   GOOGLE CALENDAR
    ----------------------------------------------------------
-   Este arquivo só faz requisições GET. A permissão pedida ao
-   Google é calendar.readonly, então o próprio Google recusaria
-   qualquer tentativa de alterar ou apagar um evento.
+   Lê a agenda (GET) e, desde 14/09/2026, cria eventos (POST em
+   criarEvento) quando o assistente pede — escopo calendar.events.
+   Nada aqui altera ou apaga eventos existentes.
    ========================================================== */
 
 window.GoogleCalendar = (() => {
@@ -176,5 +176,28 @@ window.GoogleCalendar = (() => {
         return busy;
     };
 
-    return { fetchRange, cachedEvents, eventsOn, eventsForWeek, busyMinutesByDate };
+    /* ---------- Criar evento (pede o escopo calendar.events) ---------- */
+
+    /* { titulo, data: 'AAAA-MM-DD', inicio: 'HH:MM' | '', fim: 'HH:MM' | '', lugar, descricao }
+       Sem hora = evento de dia inteiro. Fuso: o do navegador (Europe/Amsterdam na Holanda). */
+    const criarEvento = async ({ titulo, data, inicio, fim, lugar, descricao }) => {
+        if (!titulo || !data) throw new Error('O evento precisa de título e dia.');
+        const fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Amsterdam';
+        const corpo = { summary: String(titulo).trim() };
+        if (lugar) corpo.location = String(lugar).trim();
+        if (descricao) corpo.description = String(descricao).trim();
+        if (inicio) {
+            const fimReal = fim || (() => { const [h, m] = inicio.split(':').map(Number); const t = h * 60 + m + 60; return `${String(Math.floor(t / 60) % 24).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; })();
+            corpo.start = { dateTime: `${data}T${inicio}:00`, timeZone: fuso };
+            corpo.end = { dateTime: `${data}T${fimReal}:00`, timeZone: fuso };
+        } else {
+            corpo.start = { date: data };
+            corpo.end = { date: D.toDateString(D.addDays(D.fromDateString(data), 1)) };
+        }
+        const criado = await window.GoogleAPI.request(`${BASE}/calendars/primary/events`, { method: 'POST', body: JSON.stringify(corpo) });
+        try { await fetchRange(D.fromDateString(data)); } catch { /* o cache atualiza na próxima leitura */ }
+        return criado;
+    };
+
+    return { fetchRange, cachedEvents, eventsOn, eventsForWeek, busyMinutesByDate, criarEvento };
 })();

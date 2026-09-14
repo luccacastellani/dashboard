@@ -26,9 +26,9 @@ window.Assistente = (() => {
     const lerPrefs = () => {
         try {
             const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
-            return { usarClaude: p.usarClaude === true, aberto: p.aberto === true };
+            return { usarClaude: p.usarClaude === true, aberto: p.aberto === true, modelo: ['haiku', 'sonnet', 'opus'].includes(p.modelo) ? p.modelo : 'sonnet' };
         } catch {
-            return { usarClaude: false, aberto: false };
+            return { usarClaude: false, aberto: false, modelo: 'sonnet' };
         }
     };
 
@@ -38,7 +38,10 @@ window.Assistente = (() => {
         return p;
     };
 
-    let pendente = null;      // comando aguardando confirmação
+    let pendente = null;      // comando aguardando confirmação (cartão único)
+    const pendentes = new Map(); // id do cartão -> comando (vários cartões do Claude)
+    let seqCartao = 0;
+    const historico = [];     // últimas falas, para o Claude ter contexto
     let ouvindo = false;
     let recog = null;
 
@@ -74,6 +77,30 @@ window.Assistente = (() => {
         materias: materiasConhecidas(),
         treinos: treinosConhecidos()
     });
+
+    const contextoLuna = () => ({
+        agora: new Date(),
+        dieta: window.Macros ? window.Macros._dados().dieta : [],
+        tabela: window.TabelaAlimentos ? window.TabelaAlimentos.itens : []
+    });
+
+    /* Markdown mínimo do Claude -> HTML seguro (negrito, itálico, listas, links). */
+    const mdParaHtml = (md) => {
+        const linhas = String(md || '').split(/\r?\n/);
+        let html = '', emLista = false;
+        const inline = (t) => esc(t)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+            .replace(/(https?:\/\/[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        for (const l of linhas) {
+            const m = l.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+            if (m) { if (!emLista) { html += '<ul>'; emLista = true; } html += `<li>${inline(m[1])}</li>`; continue; }
+            if (emLista) { html += '</ul>'; emLista = false; }
+            if (l.trim()) html += `<p>${inline(l.replace(/^#+\s*/, ''))}</p>`;
+        }
+        if (emLista) html += '</ul>';
+        return html;
+    };
 
     /* ---------- Mensagens na tela ---------- */
 
@@ -120,7 +147,7 @@ window.Assistente = (() => {
                 return `<strong>Google Tasks:</strong> ${esc(c.titulo || '(sem título)')}`
                     + `<br><span class="assist-campo">Prazo:</span> ${esc(dataBonita(c.prazo))}`;
             default:
-                return '<strong>Não entendi.</strong>';
+                return (window.Luna && window.Luna.descrever(c)) || '<strong>Não entendi.</strong>';
         }
     };
 
@@ -138,6 +165,7 @@ window.Assistente = (() => {
         if (c.tipo === 'treino_plano' && !c.treino) faltas.push('o nome do treino');
         if (c.tipo === 'treino_serie' && !c.exercicio) faltas.push('o exercício');
         if (c.tipo === 'tarefa' && !c.titulo) faltas.push('o título');
+        if (window.Luna) faltas.push(...window.Luna.faltando(c));
         return faltas;
     };
 
@@ -208,14 +236,18 @@ window.Assistente = (() => {
                 return 'Tarefa criada no Google Tasks.';
             }
 
-            default:
-                return 'Nada a fazer.';
+            default: {
+                const r = window.Luna ? await window.Luna.aplicar(c) : null;
+                return r || 'Nada a fazer.';
+            }
         }
     };
 
     /* ---------- Confirmação ---------- */
 
     const pedirConfirmacao = (c, origem) => {
+        const id = String(++seqCartao);
+        pendentes.set(id, c);
         pendente = c;
         const faltas = faltando(c);
         const selo = origem === 'claude'
@@ -227,11 +259,12 @@ window.Assistente = (() => {
         if (faltas.length) {
             addMsg('bot', `${corpo}<div class="assist-falta">Falta ${esc(faltas.join(' e '))}. Diga de novo incluindo isso.</div>`);
             pendente = null;
+            pendentes.delete(id);
             return;
         }
 
         addMsg('bot', `${corpo}
-            <div class="assist-acoes">
+            <div class="assist-acoes" data-cartao="${id}">
                 <button type="button" class="btn btn-primary btn-sm" data-acao="confirmar">Confirmar</button>
                 <button type="button" class="btn btn-secondary btn-sm" data-acao="cancelar">Cancelar</button>
             </div>`);
@@ -240,6 +273,29 @@ window.Assistente = (() => {
     /* ---------- Claude, só quando as regras falham ---------- */
 
     const ESPERA_MAXIMA_MS = 60 * 1000;
+
+    const perguntarALuna = async (frase) => {
+        const controle = new AbortController();
+        const alarme = setTimeout(() => controle.abort(), 95 * 1000);
+        let resp;
+        try {
+            resp = await fetch('/api/luna', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: controle.signal,
+                body: JSON.stringify({ frase, estado: window.Luna.montarEstado(), historico: historico.slice(-6), modelo: lerPrefs().modelo })
+            });
+        } catch (e) {
+            if (e && e.name === 'AbortError') throw new Error('O Claude não respondeu a tempo. Tente de novo.');
+            throw e;
+        } finally {
+            clearTimeout(alarme);
+        }
+        if (!resp.ok) throw new Error('servidor respondeu ' + resp.status);
+        const dados = await resp.json();
+        if (dados.erro) throw new Error(dados.erro);
+        return dados;
+    };
 
     const perguntarAoClaude = async (frase) => {
         /* Se o servidor emperrar, o chat desiste sozinho em vez de
@@ -278,31 +334,53 @@ window.Assistente = (() => {
         if (!texto) return;
 
         addMsg('eu', esc(texto));
+        historico.push({ quem: 'Lucca', texto });
 
-        /* 1. Regras locais: grátis, instantâneo. */
-        const local = R.interpretar(texto, contexto());
+        const L = window.LunaRegras;
+        const claudeLigado = lerPrefs().usarClaude && noPC;
+        const conversa = L && L.pareceConversa(texto);
+
+        /* 1. Regras novas (comida, compras, agenda, perguntas): grátis, instantâneo. */
+        const novo = L && !(conversa && claudeLigado && !/^(quanto|qual|o que tenho|resumo)/i.test(texto)) ? L.interpretar(texto, contextoLuna()) : null;
+        if (novo && window.Luna && window.Luna.ehPergunta(novo)) {
+            const html = window.Luna.responder(novo);
+            addMsg('bot', `<span class="assist-selo">local</span>${html}`);
+            historico.push({ quem: 'Luna', texto: html.replace(/<[^>]+>/g, ' ').slice(0, 400) });
+            return;
+        }
+        if (novo) { pedirConfirmacao(novo, 'local'); return; }
+
+        /* 2. Regras antigas (pendência, avaliação, treino, tarefa). */
+        const local = conversa ? { tipo: 'desconhecido' } : R.interpretar(texto, contexto());
         if (local.tipo !== 'desconhecido') {
             pedirConfirmacao(local, 'local');
             return;
         }
 
-        /* 2. Só agora, e só se estiver ligado, o Claude entra. */
+        /* 3. Só agora, e só se estiver ligado, o Claude entra. */
         if (!lerPrefs().usarClaude) {
             addMsg('bot', `<strong>Não entendi.</strong>
-                <div class="assist-falta">Tente algo como “prova de micro dia 25” ou “pendência problem set de estatística para sexta”.
-                Se quiser que eu use o Claude para frases livres, ligue no botão <em>Claude</em> aqui em cima.</div>`);
+                <div class="assist-falta">Comandos que eu conheço: “comi 2 ovos e 50 g de arroz”, “quanto falta para as calorias?”, “treino de hoje?”,
+                “fiz supino 3x10 com 40 kg”, “treino feito”, “prova de micro dia 25”, “pendência problem set de Stats para sexta”,
+                “marca reunião amanhã às 15h”, “acabou o leite”, “lista de compras?”, “notícias de economia”, “resumo do dia”.
+                ${noPC ? 'Para conversar livremente, ligue o <em>Claude</em> aqui em cima.' : 'Conversa livre com o Claude só no PC.'}</div>`);
+            return;
+        }
+        if (!noPC) {
+            addMsg('bot', '<strong>Não entendi.</strong><div class="assist-falta">No celular eu só entendo os comandos combinados; o Claude responde quando você estiver no PC.</div>');
             return;
         }
 
         const pensando = addMsg('bot', '<span class="assist-pensando">Perguntando ao Claude…</span>');
         try {
-            const c = await perguntarAoClaude(texto);
+            const r = await perguntarALuna(texto);
             if (pensando) pensando.remove();
-            if (!c || c.tipo === 'desconhecido') {
-                addMsg('bot', '<strong>Não entendi.</strong><div class="assist-falta">Tente dizer de outro jeito.</div>');
-                return;
+            if (r.resposta) {
+                addMsg('bot', `<span class="assist-selo assist-selo-claude">Claude</span><div class="assist-md">${mdParaHtml(r.resposta)}</div>`);
+                historico.push({ quem: 'Luna', texto: r.resposta.slice(0, 600) });
             }
-            pedirConfirmacao(c, 'claude');
+            (r.acoes || []).forEach((c) => pedirConfirmacao(c, 'claude'));
+            if (!r.resposta && !(r.acoes || []).length) addMsg('bot', '<strong>Não entendi.</strong><div class="assist-falta">Tente dizer de outro jeito.</div>');
         } catch (err) {
             if (pensando) pensando.remove();
             addMsg('bot', `<strong>O Claude não respondeu.</strong>
@@ -414,12 +492,15 @@ window.Assistente = (() => {
         pintarClaude();
 
         if (botaoClaude) {
+            if (!noPC) { botaoClaude.disabled = true; botaoClaude.title = 'O Claude do seu plano só roda no PC. Aqui valem os comandos.'; }
             botaoClaude.addEventListener('click', () => {
                 const novo = !lerPrefs().usarClaude;
                 salvarPrefs({ usarClaude: novo });
                 pintarClaude();
                 addMsg('bot', novo
-                    ? '<span class="assist-pensando">Claude ligado. Frases que eu não entender vão para ele — usando a sua assinatura.</span>'
+                    ? `<span class="assist-pensando">Claude ligado (modelo ${esc(lerPrefs().modelo)}). Perguntas e conversa vão para ele com a foto do dashboard — usando a sua assinatura.
+                       <button type="button" class="assist-exemplo" data-modelo="haiku">usar Haiku (mais econômico)</button>
+                       <button type="button" class="assist-exemplo" data-modelo="sonnet">usar Sonnet (melhor)</button></span>`
                     : '<span class="assist-pensando">Claude desligado. Agora eu uso só as regras locais: nada é enviado, nada é gasto.</span>');
             });
         }
@@ -442,7 +523,10 @@ window.Assistente = (() => {
             if (!btn) return;
             const acao = btn.dataset.acao;
             const acoes = btn.closest('.assist-acoes');
+            const idCartao = acoes ? acoes.dataset.cartao : '';
             if (acoes) acoes.remove();
+            const cmd = (idCartao && pendentes.get(idCartao)) || pendente;
+            if (idCartao) pendentes.delete(idCartao);
 
             if (acao === 'cancelar') {
                 pendente = null;
@@ -450,8 +534,8 @@ window.Assistente = (() => {
                 return;
             }
 
-            if (acao === 'confirmar' && pendente) {
-                const c = pendente;
+            if (acao === 'confirmar' && cmd) {
+                const c = cmd;
                 pendente = null;
                 try {
                     const msg = await aplicar(c);
@@ -464,30 +548,34 @@ window.Assistente = (() => {
 
         abrir(prefs.aberto);
 
-        addMsg('bot', `<span class="assist-pensando">Oi! Fale ou escreva. Por exemplo:</span>
+        addMsg('bot', `<span class="assist-pensando">Oi! Sou a Luna. Fale ou escreva. Por exemplo:</span>
             <div class="assist-exemplos">
+                <button type="button" class="assist-exemplo">resumo do dia</button>
+                <button type="button" class="assist-exemplo">comi 50 g de arroz, feijão e 3 ovos</button>
+                <button type="button" class="assist-exemplo">quanto falta para as calorias?</button>
+                <button type="button" class="assist-exemplo">treino de hoje?</button>
+                <button type="button" class="assist-exemplo">fiz supino 3 por 10 com 40 quilos</button>
+                <button type="button" class="assist-exemplo">marca reunião amanhã às 15h no Polak</button>
+                <button type="button" class="assist-exemplo">acabou o leite</button>
                 <button type="button" class="assist-exemplo">prova de micro dia 25</button>
-                <button type="button" class="assist-exemplo">pendência problem set de estatística para sexta, difícil</button>
-                <button type="button" class="assist-exemplo">treino de pernas na quarta</button>
-                <button type="button" class="assist-exemplo">fiz agachamento 3 por 10 com 40 quilos</button>
             </div>`);
 
         $('assist-mensagens').addEventListener('click', (e) => {
             const ex = e.target.closest('.assist-exemplo');
-            if (ex) processar(ex.textContent);
+            if (!ex) return;
+            if (ex.dataset.modelo) {
+                salvarPrefs({ modelo: ex.dataset.modelo });
+                addMsg('bot', `<span class="assist-pensando">Modelo: ${esc(ex.dataset.modelo)}.</span>`);
+                return;
+            }
+            processar(ex.textContent);
         });
     };
 
-    /* O mini chat só existe onde existe o servidor do PC (localhost).
-       No site publicado / no celular, a bolha nem aparece. */
+    /* O chat existe em todo lugar (as regras rodam no aparelho).
+       O Claude do plano dela só é alcançável pelo servidor do PC (localhost). */
     const noPC = ['localhost', '127.0.0.1'].includes(location.hostname);
-    document.addEventListener('DOMContentLoaded', () => {
-        if (noPC) { ligar(); return; }
-        const bolha = $('assistente-bolha');
-        const painel = $('assistente-painel');
-        if (bolha) bolha.remove();
-        if (painel) painel.remove();
-    });
+    document.addEventListener('DOMContentLoaded', ligar);
 
     return { processar, abrir, aplicar, descrever, faltando };
 })();

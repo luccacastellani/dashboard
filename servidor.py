@@ -22,7 +22,7 @@ except ImportError:
     assistente_claude = None
 
 PORTA_PADRAO = 8000
-LIMITE_CORPO = 8 * 1024      # uma frase falada nao passa nem perto disso
+LIMITE_CORPO = 256 * 1024    # a frase mais a "foto" do dashboard (modo Luna)
 
 
 class SemCache(SimpleHTTPRequestHandler):
@@ -68,7 +68,8 @@ class SemCache(SimpleHTTPRequestHandler):
         self._responder_json({"hits": dados.get("hits") or dados.get("products") or []}, 200)
 
     def do_POST(self):
-        if self.path.rstrip("/") != "/api/assistente":
+        rota = self.path.rstrip("/")
+        if rota not in ("/api/assistente", "/api/luna"):
             self.send_error(404, "Endereco nao encontrado")
             return
 
@@ -97,6 +98,19 @@ class SemCache(SimpleHTTPRequestHandler):
             return
 
         inicio = time.monotonic()
+
+        if rota == "/api/luna":
+            # Modo Luna: frase + foto do dashboard -> resposta + acoes
+            modelo = str(pedido.get("modelo") or "sonnet")
+            if modelo not in ("haiku", "sonnet", "opus"):
+                modelo = "sonnet"
+            resposta, erro = assistente_claude.conversar(
+                frase, pedido.get("estado") or {}, pedido.get("historico") or [], modelo)
+            print(f"  luna ({modelo}): {time.monotonic() - inicio:.1f}s "
+                  f"{'erro: ' + erro if erro else 'ok'}", flush=True)
+            self._responder_json({"erro": erro} if erro else resposta, 200)
+            return
+
         comando, erro = assistente_claude.interpretar(
             frase,
             str(pedido.get("hoje") or ""),
