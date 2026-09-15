@@ -393,67 +393,100 @@ window.Assistente = (() => {
 
     const vozDisponivel = () => 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 
+    /* Modo "aperta e fala": o microfone fica aberto até você apertar de
+       novo. Pausas não encerram nada; o que foi dito vai se acumulando no
+       campo. Ao parar, o texto fica no campo para conferir e editar — só
+       vai quando ela manda. Se o navegador fechar o reconhecimento sozinho
+       (o Chrome faz isso em silêncios longos, o iPhone também), reabrimos. */
+    let querOuvir = false;   // ela apertou para falar e ainda não apertou para parar
+    let falado = '';         // o que veio de sessões anteriores do reconhecimento (ele reabre sozinho)
+    let parcial = '';        // a sessão atual, montada de novo a cada evento (o Safari reenvia tudo)
+    let alarmeVoz = null;
+    const LIMITE_VOZ_MS = 3 * 60 * 1000;
+
+    const mostrarFalado = () => {
+        const campo = $('assist-entrada');
+        if (campo) campo.value = (falado + ' ' + parcial).replace(/\s+/g, ' ').trim();
+    };
+
+    const pintarMic = (ativo) => {
+        const b = $('assist-mic');
+        if (b) { b.classList.toggle('ouvindo', ativo); b.title = ativo ? 'Ouvindo… aperte de novo quando terminar' : 'Falar'; }
+        const campo = $('assist-entrada');
+        if (campo) campo.placeholder = ativo ? 'Ouvindo… aperte o microfone quando terminar' : 'Fale ou escreva…';
+    };
+
     const prepararVoz = () => {
         if (recog || !vozDisponivel()) return recog;
         const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
         recog = new Rec();
         recog.lang = 'pt-BR';
         recog.interimResults = true;
-        recog.continuous = false;
+        recog.continuous = true;
         recog.maxAlternatives = 1;
 
-        recog.onstart = () => {
-            ouvindo = true;
-            const b = $('assist-mic');
-            if (b) { b.classList.add('ouvindo'); b.title = 'Ouvindo… clique para parar'; }
-            const campo = $('assist-entrada');
-            if (campo) campo.placeholder = 'Ouvindo…';
-        };
+        recog.onstart = () => { ouvindo = true; pintarMic(true); };
 
         recog.onresult = (e) => {
+            /* Remonta a sessão inteira a partir de results[0]: o Chrome só manda
+               o que mudou, o Safari manda tudo de novo — assim os dois batem. */
             let texto = '';
-            for (let i = e.resultIndex; i < e.results.length; i++) texto += e.results[i][0].transcript;
-            const campo = $('assist-entrada');
-            if (campo) campo.value = texto.trim();
-            /* Resultado final: envia sozinho. */
-            if (e.results[e.results.length - 1].isFinal) {
-                const frase = texto.trim();
-                if (campo) campo.value = '';
-                processar(frase);
-            }
+            for (let i = 0; i < e.results.length; i++) texto += e.results[i][0].transcript;
+            parcial = texto;
+            mostrarFalado();
         };
 
         recog.onerror = (e) => {
+            if (e.error === 'no-speech' || e.error === 'aborted') return; // o onend cuida
+            querOuvir = false;
             ouvindo = false;
-            const b = $('assist-mic');
-            if (b) b.classList.remove('ouvindo');
-            const campo = $('assist-entrada');
-            if (campo) campo.placeholder = 'Fale ou escreva…';
+            pintarMic(false);
             if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-                addMsg('bot', '<strong>Sem permissão para o microfone.</strong><div class="assist-falta">Clique no cadeado ao lado do endereço e libere o microfone para localhost.</div>');
-            } else if (e.error === 'no-speech') {
-                addMsg('bot', '<span class="assist-pensando">Não ouvi nada.</span>');
+                addMsg('bot', '<strong>Sem permissão para o microfone.</strong><div class="assist-falta">Clique no cadeado ao lado do endereço e libere o microfone.</div>');
             }
         };
 
         recog.onend = () => {
             ouvindo = false;
-            const b = $('assist-mic');
-            if (b) { b.classList.remove('ouvindo'); b.title = 'Falar'; }
+            if (querOuvir) {
+                /* Fechou sozinho no meio da fala: guarda a sessão e reabre sem perder nada. */
+                falado = (falado + ' ' + parcial).trim(); parcial = '';
+                try { recog.start(); return; } catch { /* segue para encerrar */ }
+            }
+            pintarMic(false);
+            /* Terminou de falar: o texto fica no campo para ela conferir,
+               corrigir e mandar com o ↑ (ou Enter). Nada é enviado sozinho. */
+            const frase = (falado + ' ' + parcial).replace(/\s+/g, ' ').trim();
+            falado = ''; parcial = '';
             const campo = $('assist-entrada');
-            if (campo) campo.placeholder = 'Fale ou escreva…';
+            if (campo) {
+                campo.value = frase;
+                campo.placeholder = frase ? 'Confira e mande com ↑' : 'Fale ou escreva…';
+                campo.focus();
+                try { campo.setSelectionRange(frase.length, frase.length); } catch { /* ignora */ }
+            }
+            if (!frase) addMsg('bot', '<span class="assist-pensando">Não ouvi nada.</span>');
         };
 
         return recog;
     };
 
+    const pararVoz = () => {
+        querOuvir = false;
+        if (alarmeVoz) { clearTimeout(alarmeVoz); alarmeVoz = null; }
+        if (recog) { try { recog.stop(); } catch { /* ignora */ } }
+    };
+
     const alternarVoz = () => {
         const r = prepararVoz();
         if (!r) {
-            addMsg('bot', '<strong>Este navegador não tem reconhecimento de voz.</strong><div class="assist-falta">No Chrome funciona. Você pode escrever normalmente.</div>');
+            addMsg('bot', '<strong>Este navegador não tem reconhecimento de voz.</strong><div class="assist-falta">No Chrome e no Safari do iPhone funciona. Você pode escrever normalmente.</div>');
             return;
         }
-        if (ouvindo) { r.stop(); return; }
+        if (querOuvir) { pararVoz(); return; }
+        falado = ''; parcial = '';
+        querOuvir = true;
+        alarmeVoz = setTimeout(pararVoz, LIMITE_VOZ_MS);
         try { r.start(); } catch { /* já estava ouvindo */ }
     };
 
@@ -514,6 +547,8 @@ window.Assistente = (() => {
             const campo = $('assist-entrada');
             const texto = campo.value;
             campo.value = '';
+            campo.placeholder = 'Fale ou escreva…';
+            if (querOuvir) pararVoz();
             processar(texto);
         });
 
