@@ -56,8 +56,10 @@ window.ESE_CONFIG = {
 
     /* Permissões pedidas ao Google.
        tasks           = ler e escrever suas tarefas
-       calendar.events = ler a agenda e CRIAR eventos (o assistente
-                         marca compromissos que você pede; nada é apagado)
+       calendar.readonly = ler as suas agendas (a lista de agendas só
+                         abre com esta permissão)
+       calendar.events = CRIAR eventos (o assistente marca compromissos
+                         que você pede; nada é apagado)
        gmail.labels    = APENAS a contagem de não lidas. Com este
                          escopo o dashboard NÃO consegue ler nenhuma
                          mensagem sua, nem assunto, nem remetente.
@@ -66,6 +68,7 @@ window.ESE_CONFIG = {
                          PC e celular. Nenhum arquivo seu é visível. */
     SCOPES: [
         'https://www.googleapis.com/auth/tasks',
+        'https://www.googleapis.com/auth/calendar.readonly',
         'https://www.googleapis.com/auth/calendar.events',
         'https://www.googleapis.com/auth/gmail.labels',
         'https://www.googleapis.com/auth/drive.appdata'

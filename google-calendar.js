@@ -82,10 +82,18 @@ window.GoogleCalendar = (() => {
     /* ---------- Requisições ---------- */
 
     const fetchCalendars = async () => {
-        const items = await window.GoogleAPI.requestAllPages(
-            `${BASE}/users/me/calendarList`,
-            { maxResults: 250, minAccessRole: 'reader' }
-        );
+        let items;
+        try {
+            items = await window.GoogleAPI.requestAllPages(
+                `${BASE}/users/me/calendarList`,
+                { maxResults: 250, minAccessRole: 'reader' }
+            );
+        } catch (err) {
+            /* 403 aqui quer dizer "falta a permissão de ler as agendas".
+               Seguimos com a agenda principal em vez de mostrar erro. */
+            if (err && err.status === 403) return AGENDA_PRINCIPAL;
+            throw err;
+        }
 
         /* O id da agenda principal é o e-mail da conta. Guardamos para
            a renovação silenciosa saber qual conta usar. */
@@ -103,6 +111,11 @@ window.GoogleCalendar = (() => {
                 color: c.backgroundColor || FALLBACK_COLORS[i % FALLBACK_COLORS.length]
             }));
     };
+
+    /* Sem permissão para listar as agendas (só calendar.events), ainda dá
+       para ler a agenda principal — é onde estão as aulas e a maior parte
+       dos compromissos. Melhor isso do que uma semana vazia. */
+    const AGENDA_PRINCIPAL = [{ id: 'primary', title: 'Minha agenda', color: FALLBACK_COLORS[0] }];
 
     const fetchEventsForCalendar = async (calendar, timeMin, timeMax) => {
         const items = await window.GoogleAPI.requestAllPages(

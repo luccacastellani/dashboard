@@ -76,7 +76,7 @@ window.GoogleAPI = (() => {
                 if (apiMessage && /disabled|not been used/i.test(apiMessage)) {
                     return 'A API não está ativada no seu projeto do Google Cloud. Veja o LEIA-ME.md.';
                 }
-                return 'O Google recusou o acesso. Confira as permissões no LEIA-ME.md.';
+                return 'Falta uma permissão do Google. Clique em "Conectar ao Google" e aceite todas as caixinhas da tela de autorização.';
             case 404:
                 return 'O Google não encontrou esse item. Ele pode ter sido apagado.';
             case 429:
