@@ -130,7 +130,9 @@ window.GoogleAPI = (() => {
         if (!response.ok) {
             /* Token recusado: renova uma vez e repete. */
             if (response.status === 401 && !isRetry) {
-                window.GoogleAuth.disconnect();
+                /* Esquece o token, mas guarda a autorização: assim a
+                   próxima abertura da página reconecta sem perguntar. */
+                (window.GoogleAuth.expirarToken || window.GoogleAuth.disconnect)();
                 return request(url, options, { isRetry: true });
             }
             throw new GoogleError(describeHttpError(response.status, body), {

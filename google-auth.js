@@ -152,7 +152,9 @@ window.GoogleAuth = (() => {
        nunca interrompemos a usuária com uma janela no meio do caminho. */
     const getAccessToken = async () => {
         if (isConnected()) return accessToken;
-        return requestToken({ interactive: false });
+        /* Sem token válido: quem chamou mostra "Reconectar". A renovação
+           sem tela acontece no próximo carregamento (prompt=none). */
+        throw new Error('SEM_TOKEN');
     };
 
     /* ---------- Conexão por redirecionamento ----------
@@ -305,13 +307,23 @@ window.GoogleAuth = (() => {
        Tenta renovar em silêncio (num iframe, sem pop-up);
        se não der, redireciona a página para o Google.         */
     const connect = async () => {
-        try {
-            return await requestToken({ interactive: false });
-        } catch {
-            startRedirectConnect();
-            /* A página vai sair do ar; esta promessa nunca resolve. */
-            return new Promise(() => {});
-        }
+        /* Direto para o redirecionamento. O cliente de token do Google
+           sempre tenta abrir uma janelinha, que o navegador bloqueia —
+           tentar antes só atrasava a conexão e sujava o console. */
+        startRedirectConnect();
+        /* A página vai sair do ar; esta promessa nunca resolve. */
+        return new Promise(() => {});
+    };
+
+    /* Token recusado (venceu antes da hora): esquece só o token.
+       A autorização continua valendo, então o próximo carregamento
+       renova sozinho, sem tela. Diferente de disconnect(), que é a
+       usuária dizendo "não quero mais ficar conectada". */
+    const expirarToken = () => {
+        accessToken = null;
+        tokenExpiresAt = 0;
+        try { sessionStorage.removeItem(TENTOU_KEY); } catch { /* ignora */ }
+        notify();
     };
 
     const disconnect = () => {
@@ -375,12 +387,10 @@ window.GoogleAuth = (() => {
             }
         }
 
-        try {
-            await requestToken({ interactive: false });
-            return true;
-        } catch {
-            return false;
-        }
+        /* Nunca autorizou neste navegador (ou já tentou nesta sessão):
+           fica desconectada e mostra o botão. Nada de janelinha aqui —
+           era isso que, ao abrir a página, jogava a aba para o Google. */
+        return false;
     };
 
     let lastRedirectError = null;
@@ -394,7 +404,7 @@ window.GoogleAuth = (() => {
         getState, onChange,
         readSettings, saveSettings,
         isConfigured, isConnected,
-        getAccessToken, connect, disconnect, restore,
+        getAccessToken, connect, disconnect, expirarToken, restore,
         takeRedirectError, saveLoginHint, readLoginHint
     };
 })();
