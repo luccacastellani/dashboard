@@ -5,7 +5,10 @@ name: noticias
 
 on:
   schedule:
-    - cron: "17 * * * *"      # todo minuto 17 de cada hora (UTC)
+    # Duas tentativas por hora, em minutos "impopulares": o GitHub atrasa
+    # agendamentos de repositórios gratuitos quando está cheio, então quanto
+    # mais tentativas, menor a chance de o jornal ficar velho.
+    - cron: "6,36 * * * *"
   workflow_dispatch:           # botão "Run workflow" na aba Actions
   push:
     branches: [main]

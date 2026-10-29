@@ -31,6 +31,10 @@ window.ESE_CONFIG = {
     /* Link do Claude (abre uma conversa nova). */
     CLAUDE_URL: 'https://claude.ai/new',
 
+    /* Onde o robô publica o jornal (ramo "noticias" do repositório).
+       Serve para o PC ler o mesmo arquivo que o celular lê. */
+    NOTICIAS_URL: 'https://raw.githubusercontent.com/luccacastellani/dashboard/noticias/noticias.json',
+
     /* Link do LinkedIn. */
     LINKEDIN_URL: 'https://www.linkedin.com/feed/',
 

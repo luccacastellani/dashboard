@@ -150,12 +150,13 @@ window.Noticias = (() => {
         carregando = true;
         erro = '';
         render();
+        /* O que o robô publicou vem sempre primeiro — é o mesmo arquivo
+           no PC e no celular. Um noticias.json ao lado do index.html só
+           entra se o publicado não responder (teste sem internet). */
         const candidatos = [];
-        const local = typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-        if (local) candidatos.push('noticias.json');
         const pub = urlPublicada();
         if (pub) candidatos.push(pub);
-        if (!local) candidatos.push('noticias.json');
+        candidatos.push('noticias.json');
         let ok = null;
         for (const url of candidatos) {
             try { ok = await buscarJson(url); break; } catch (e) { erro = e.message; }
